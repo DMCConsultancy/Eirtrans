@@ -50,6 +50,7 @@ export default class Morning extends Component {
                 </Header>
 
                 <View style={styles.content}>
+                    <TouchableOpacity onPress={()=> this.props.navigation.navigate('Truckdetail')}>
                 <Table borderStyle={styles.borderStyle} >
                                 <Row data={state.tableHead} style={styles.head} textStyle={styles.text} />
                                 {
@@ -65,8 +66,15 @@ export default class Morning extends Component {
                                         </TableWrapper>
                                     ))
                                 }
-                            </Table>
+                 </Table>
+                 </TouchableOpacity>
 
+               <View style={{alignItems:"center"}}>
+                 <TouchableOpacity onPress={()=>this.setModalVisible(!this.state.modalVisible_alert)}
+                 style={styles.btnsty}>
+                     <Text style={styles.mybtnText}>Load Collected</Text>
+                 </TouchableOpacity>
+                 </View>
            
                 </View>
               
@@ -81,18 +89,16 @@ export default class Morning extends Component {
           onRequestClose={() => {
             this.setModalVisible(!this.state.modalVisible_alert);
           }}>
-          <View style={styles.center}>
+          <View style={[styles.center,{flex:1}]}>
             <View style={styles.modalView}>
                 <Success name="check" color="green" size={56} />
             <Text style={styles.successtxt}>Success!</Text>
 
-            <Text style={styles.mytxt}>New morning Successfully.</Text>
 
             <TouchableOpacity style={styles.okbtn} 
             onPress={()=> {this.setModalVisible(!this.state.modalVisible_alert)
-            this.props.navigation.goBack()
             }} >
-                <Text style={[styles.formLabal,{color:"#fff"}]}>Ok</Text>
+                <Text style={[styles.mybtnText,{color:"#fff"}]}>Ok</Text>
             </TouchableOpacity>
              
             </View>

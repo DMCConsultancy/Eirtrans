@@ -94,7 +94,7 @@ export default class Home extends Component {
                             }}
                             borderWidth={2}
                             buttonInnerColor={'red'}
-                            buttonOuterColor={this.state.value3Index === i ? 'red' : 'red'}
+                            buttonOuterColor={colors.danger}
                             buttonSize={10}
                             buttonOuterSize={20}
                             buttonStyle={{}}

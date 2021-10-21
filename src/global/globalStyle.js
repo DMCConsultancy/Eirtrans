@@ -1,10 +1,14 @@
-import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 
 const colors = {
-    warning: "yellow",
-    primary: "#E75935",
-    danger: 'red',
-    success: 'rgba(32, 32, 32, 0.5)'
+    warning: "#F8E00A",
+    warninglight:"#FFDE59",    
+    danger: '#C41407',
+    dangerlight:"#EE3F32",
+    success: '#328F36',
+    succeslight:"#99B83C",
+    primary:"#5C6D94",
+    primarylight:"#5CBE01",
+    blue:"#1D45B2"
 }
 
 const size = {
@@ -25,7 +29,8 @@ const images = {
     logo: require('../images/logoadmin.png'),
     bg : require('../images/bg.jpeg'),
     menu : require('../images/menu.png'),
-
+    map : require('../images/map.jpg'),
+    car : require('../images/car1.png')
   
 }
 

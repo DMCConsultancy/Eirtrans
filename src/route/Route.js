@@ -1,4 +1,4 @@
-import {Dimensions} from "react-native";
+import { Dimensions } from "react-native";
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -14,78 +14,130 @@ import Job from "../screens/job/Job";
 import HomeExpenses from "../screens/homeEx/HomeExpenses";
 import CustomSidebarMenu from "./CustomSidebarMenu";
 import Testdetails from "../screens/testdetail/Testdetails";
+import Truckdetail from "../screens/truckdetail/Truckdetail";
+import Cars from "../screens/car/Cars";
+import Description from "../screens/description/Description";
+import Customerdetail from "../screens/customerdetail/Customerdetail";
+import NotificationDetail from "../screens/notification/NotificationDetail";
 
-const HomeStack = createStackNavigator({
-    Home: {
-        screen: Home,
-        navigationOptions:{
-            headerShown:false
-        }
-    },
-    Morning: {
-        screen: Morning,
-        navigationOptions:{
-          headerShown:false
-      }
-    },
-    Job: {
-        screen: Job,
-        navigationOptions:{
-          headerShown:false
-      }
-    },
-    Testdetails:{
-    screen:Testdetails,
+const Notification_stack = createStackNavigator({
+  Notification:{
+    screen:Notification,
     navigationOptions:{
       headerShown:false
-  }
-    },
+    }
+  },
+  NotificationDetail:{
+    screen:NotificationDetail,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+})
 
-    HomeExpenses: {
-        screen: HomeExpenses,
-    },
-   
+const HomeStack = createStackNavigator({
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  Morning: {
+    screen: Morning,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  Job: {
+    screen: Job,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  Testdetails: {
+    screen: Testdetails,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+
+  Truckdetail: {
+    screen: Truckdetail,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+
+  Cars: {
+    screen: Cars,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+
+  Description:{
+    screen:Description,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+  Customerdetail:{
+    screen:Customerdetail,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+
+ 
+
+  HomeExpenses: {
+    screen: HomeExpenses,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+
 })
 
 const DrawerNavigator = createDrawerNavigator({
-    Home: {
-        screen: HomeStack,
-      },
-      Notification: {
-        screen: Notification,
-      },
-      Expenses: {
-        screen: Expenses,
-      },
-      Contact: {
-        screen: Contact,
-      },
-      About: {
-        screen: About,
-      },
-      Terms: {
-        screen: Terms,
-      },
+  Home: {
+    screen: HomeStack,
+  },
+  Notification: {
+    screen: Notification_stack,
+  },
+  Expenses: {
+    screen: Expenses,
+  },
+  Contact: {
+    screen: Contact,
+  },
+  About: {
+    screen: About,
+  },
+  Terms: {
+    screen: Terms,
+  },
 
-      Logout: {
-        screen: Login,
-      },
-      
+  Logout: {
+    screen: Login,
+  },
+
 },
-{
-      contentComponent: CustomSidebarMenu,
+  {
+    contentComponent: CustomSidebarMenu,
     drawerWidth: Dimensions.get('window').width - 100,
   })
 
 
 const SwitchNavigator = createSwitchNavigator({
-    Login: {
-        screen: Login,
-      },
+  Login: {
+    screen: Login,
+  },
 
-    Dashboard :{ 
-        screen: DrawerNavigator,
-    },  
+  Dashboard: {
+    screen: DrawerNavigator,
+  },
 })
 
 export default createAppContainer(SwitchNavigator);

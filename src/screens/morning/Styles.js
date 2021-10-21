@@ -1,5 +1,5 @@
 import { StyleSheet,Platform } from "react-native";
-import { fontfamily, size } from "../../global/globalStyle";
+import { colors, fontfamily, size } from "../../global/globalStyle";
 
 const styles = StyleSheet.create({
     container: {
@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
     },
     borderStyle:{ borderColor: '#000', borderWidth: 2 },
     yesbtn:{
-        backgroundColor:"green",
+        backgroundColor:colors.success,
         width:121,
         height:49,
         alignItems:"center",
         justifyContent:"center"
     },
     nobtn:{
-        backgroundColor:"red",
+        backgroundColor:colors.dangerlight,
         width:121,
         height:49,
         alignItems:"center",
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         marginTop:10
       },
       okbtn:{
-          backgroundColor:"green",
+          backgroundColor:colors.primarylight,
           borderRadius:5,
           paddingHorizontal:30,
           paddingVertical:10,

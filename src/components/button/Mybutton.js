@@ -9,7 +9,7 @@ const MyButton = ({ onPress, title, backgroundColor,disabled, color, textTransfo
   <TouchableOpacity onPress={onPress} 
   style={[
     styles.appButtonContainer,
-    backgroundColor && { backgroundColor }
+    backgroundColor && { backgroundColor } 
   ]}
   disabled = {disabled}
   >
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
          left:25
     },
     appButtonContainer: {
-      backgroundColor: colors.danger,
+      backgroundColor: colors.dangerlight,
       paddingVertical: 12,
       paddingHorizontal: 12,
       justifyContent:'center',

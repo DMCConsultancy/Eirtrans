@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Text, View, Button, TouchableOpacity, Image, StatusBar, TextInput, Modal, ImageBackground, ScrollView } from "react-native";
+import { Text, View, Button, TouchableOpacity, Image, StatusBar, Modal, ImageBackground, ScrollView } from "react-native";
 import { Container, Header, Left, Right } from "native-base";
 import styles from "./Styles";
-import { images, size, fontfamily, colors } from "../../global/globalStyle";
+import { images} from "../../global/globalStyle";
 import Icon from "react-native-vector-icons/Feather";
 import Success from "react-native-vector-icons/SimpleLineIcons";
 import MyButton from "../../components/button/Mybutton";

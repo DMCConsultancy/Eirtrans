@@ -261,7 +261,7 @@ export default class Morning extends Component {
           }}>
           <View style={styles.center}>
             <View style={styles.modalView}>
-                <Success name="check" color="green" size={56} />
+                <Success name="check" color={colors.primarylight} size={56} />
             <Text style={styles.successtxt}>Success!</Text>
 
             <Text style={styles.mytxt}>New morning Successfully.</Text>
