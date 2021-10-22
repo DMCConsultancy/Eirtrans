@@ -1,81 +1,104 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {images, colors, size, fontfamily} from "../global/globalStyle";
+import { DrawerActions } from 'react-navigation-drawer';
 
 var { width,height } = Dimensions.get('window');
 export default class CustomSidebarMenu extends Component {
 
     constructor() {
         super();
-        this.niv = [
-            {
-                navOptionThumb: 'home',
-                navOptionName: 'Home',
-                screenToNavigate: 'Home',
-            },
-            {
-                navOptionThumb: 'bell',
-                navOptionName: 'Notification',
-                screenToNavigate: 'Notification',
-            },
-            {
-                navOptionThumb: 'dollar',
-                navOptionName: 'Expenses',
-                screenToNavigate: 'Expenses',
-            },
-            {
-                navOptionThumb: 'mobile',
-                navOptionName: 'Contact Us',
-                screenToNavigate: 'Contact',
-            },
-            {
-                navOptionThumb: 'user',
-                navOptionName: 'About us',
-                screenToNavigate: 'About',
-            },
-            {
-                navOptionThumb: 'user',
-                navOptionName: 'Terms & conditions',
-                screenToNavigate: 'Terms',
-            },
-            {
-                navOptionThumb: 'user',
-                navOptionName: 'Logout',
-                screenToNavigate: 'Login',
-            },
-        ];
+       
     }
 
     render() {
+        const {navigate} = this.props.navigation.navigate
         return (
             <View>
-
+               <ScrollView>
                 <Image style={styles.logo}
                 source={images.logo} />
-                <View style={{ width: '100%', marginTop: 10 }}>
+                 
+                 <TouchableOpacity onPress={()=>{
+                      this.props.navigation.dispatch(DrawerActions.toggleDrawer())
+                     this.props.navigation.navigate('Home')}}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.home} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>Home</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
 
-                    {this.niv.map((niv, key) => (
-                        <TouchableOpacity 
-                            onPress={() => {
-                                global.currentScreenIndex = key;
-                                this.props.navigation.navigate(niv.screenToNavigate);
-                            }}>
-                            <View style={styles.border}>
-                                <View style={{ marginLeft: 30, width: "20%" }}>
-                                    <Icon name={niv.navOptionThumb} size={22} color="#9564f1" />
-                                </View>
-                                <View style={{ width: "80%" }}>
-                                    <Text
-                                        style={styles.title}>
-                                        {niv.navOptionName}
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={{height:1, backgroundColor:"#ccc"}} />
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Notification')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.bell} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>Notification</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Expenses')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.dollar} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>My Expense</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Contact')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.contact} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>Contact Us</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('About')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.group} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>About Us</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Terms')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.terms} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>Terms & Condition</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Login')}
+                 style={styles.row}>
+                    <View style={styles.width20}>
+                    <Image source={images.logout} style={styles.imagesty} />
+                    </View>
+                    <View style={styles.width80}>
+                      <Text style={styles.title}>Logout</Text>
+                    </View>
+                    </TouchableOpacity>
+                    <View style={styles.border} />
+</ScrollView>
             </View>
         )
     }
@@ -86,14 +109,31 @@ const styles = StyleSheet.create({
         width: width * 0.8,
         height: width * 0.4,
         resizeMode: "contain",
-        marginTop: 20
+        marginTop: 10
     },
     border:{
+        height:1,
+        backgroundColor:"#ccc",
        
-         flexDirection: 'row', alignItems: 'center', paddingVertical:20
     },
     title:{
-        fontSize: size.label, color: colors.danger,
+        fontSize: size.label, color: colors.dangerlight,
         fontFamily: fontfamily.regular
+    },
+    row:{
+        flexDirection:"row",
+        paddingVertical:25,
+        alignItems:"center"
+    },
+    width20:{
+        width:"20%",
+        marginLeft:20
+    },
+    width80:{
+        width:"80%"
+    },
+    imagesty:{
+        height:25,
+        width:25
     }
 })

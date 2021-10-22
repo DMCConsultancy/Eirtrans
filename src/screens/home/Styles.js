@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         top:10, right:15
     },
     labelStyle:{
-        fontFamily:fontfamily.medium,
+        fontFamily:fontfamily.bold,
         fontSize: size.subtitle,
         color:"#000"
     }

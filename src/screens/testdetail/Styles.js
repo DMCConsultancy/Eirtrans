@@ -9,16 +9,20 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+         width:20,
+         height:20
+    },
     headersty:{
         backgroundColor:'transparent',
         elevation:0
     },
     rightbox:{
         borderColor:"#000",
-        borderWidth:1,
+        borderWidth:1.5,
         paddingHorizontal:20,
         paddingVertical:3,
-        borderRadius:5
+        borderRadius:3
     },
     text:{
         fontSize: size.label,
@@ -37,13 +41,13 @@ const styles = StyleSheet.create({
     },
     borderStyle:{ borderColor: '#000', borderWidth: 2 },
     head: {  backgroundColor: '#fff',},
-    text: { padding:3,
-    fontSize: size.label,textTransform:"uppercase",
+    text: { padding:3,textAlign:"center",
+    fontSize: size.subtitle,textTransform:"uppercase",
     fontFamily: fontfamily.bold },
     textCell:{
         padding:3,textAlign:"center",
-        fontSize: size.label,textTransform:"capitalize",
-        fontFamily: fontfamily.regular
+        fontSize: size.subtitle,textTransform:"capitalize",
+        fontFamily: fontfamily.medium
     },
     row: { 
         flexDirection: 'row', 

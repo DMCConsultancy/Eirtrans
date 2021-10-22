@@ -9,6 +9,10 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+     width:20,
+     height:20
+    },
     headersty:{
         backgroundColor:'transparent',
         elevation:0
@@ -22,7 +26,7 @@ const styles = StyleSheet.create({
     },
     text:{
         fontSize: size.subtitle,
-        fontFamily: fontfamily.medium,
+        fontFamily: fontfamily.bold,
         color:"#000"
     },
     row:{
@@ -54,7 +58,7 @@ const styles = StyleSheet.create({
     },
     maptxtsty:{
         fontSize: 26,
-        fontFamily: fontfamily.light,
+        fontFamily: fontfamily.medium,
         color:"#000",
         position:"absolute",
         top:65,
@@ -86,7 +90,7 @@ const styles = StyleSheet.create({
         width:"50%"
     },
     label:{
-        fontFamily: fontfamily.regular,
+        fontFamily: fontfamily.medium,
         fontSize: size.label,
         color:"#000"
     },
@@ -116,7 +120,7 @@ const styles = StyleSheet.create({
     },
     heading:{
         fontSize:28,
-        fontFamily: fontfamily.medium,
+        fontFamily: fontfamily.bold,
         color:"#000",textAlign:"center"
     },
     btnsty:{
@@ -183,13 +187,13 @@ const styles = StyleSheet.create({
       },
       successtxt:{
           fontSize: 24,
-          fontFamily: fontfamily.light,
+          fontFamily: fontfamily.regular,
           color:"#000",
           marginTop:10
       },
       mytxt:{
-        fontSize: size.subtitle,
-        fontFamily: fontfamily.light,
+        fontSize: size.title,
+        fontFamily: fontfamily.regular,
         color:"#777",
         marginTop:20
       }

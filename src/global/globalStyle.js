@@ -8,7 +8,8 @@ const colors = {
     succeslight:"#99B83C",
     primary:"#5C6D94",
     primarylight:"#5CBE01",
-    blue:"#1D45B2"
+    blue:"#1D45B2",
+    skyblue :"#CED9EB"
 }
 
 const size = {
@@ -19,10 +20,10 @@ const size = {
 }
 
 const fontfamily = {
-    bold: 'Mula-Bold',
-    regular: 'Mula-Regular',
-    medium: 'Mula-Medium',
-    light: 'Mula-Light',
+    bold: 'Roboto-Bold',
+    regular: 'Roboto-Regular',
+    medium: 'Roboto-Medium',
+    light: 'Roboto-Light',
 }
 
 const images = {
@@ -30,8 +31,16 @@ const images = {
     bg : require('../images/bg.jpeg'),
     menu : require('../images/menu.png'),
     map : require('../images/map.jpg'),
-    car : require('../images/car1.png')
-  
+    car : require('../images/car1.png'),
+    owners : require('../images/eirtrans-owners.jpg'),
+    bell : require('../images/bell.png'),
+    contact : require ('../images/contact.png'),
+    dollar : require('../images/dollar.png'),
+    group : require('../images/Group.png'),
+    home : require('../images/home.png'),
+    logout : require('../images/logout.png'),
+    terms : require('../images/terms.png'),
+    arrow: require('../images/left-arrow.png')
 }
 
 

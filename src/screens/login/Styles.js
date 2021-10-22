@@ -31,10 +31,11 @@ const styles = StyleSheet.create({
         height: 45,
         color: "#ffff",
         fontSize: size.subtitle,
-        fontFamily: fontfamily.regular,
+        fontFamily: fontfamily.medium,
         paddingHorizontal: 10,
         marginTop: 40,
         borderRadius: 4,
+        letterSpacing:1
     },
     overlay: {
         // ...StyleSheet.absoluteFillObject,

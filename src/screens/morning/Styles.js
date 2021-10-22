@@ -8,6 +8,11 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+      width:20,
+      height:20,
+     
+    },
     headersty:{
         backgroundColor:'transparent',
         elevation:0
@@ -20,12 +25,12 @@ const styles = StyleSheet.create({
     },
     head: { height: 40, backgroundColor: '#fff',},
     text: { textAlign:"center",  
-    fontSize: size.label,
-    fontFamily: fontfamily.medium },
+    fontSize: size.subtitle,
+    fontFamily: fontfamily.bold },
     row: { 
         flexDirection: 'row', 
         backgroundColor: '#FFF', 
-        height:50,
+        // height:50,
     },
     btn: { width: 58,  backgroundColor: '#78B7BB',  borderRadius: 2 },
     btnText: { textAlign: 'center', color: '#000' , fontSize: size.label,
@@ -37,15 +42,13 @@ const styles = StyleSheet.create({
     borderStyle:{ borderColor: '#000', borderWidth: 2 },
     yesbtn:{
         backgroundColor:colors.success,
-        width:121,
-        height:49,
         alignItems:"center",
-        justifyContent:"center"
+        justifyContent:"center",
+        flex:1,
     },
     nobtn:{
         backgroundColor:colors.dangerlight,
-        width:121,
-        height:49,
+        flex:1,
         alignItems:"center",
         justifyContent:"center"
     },
@@ -56,20 +59,20 @@ const styles = StyleSheet.create({
     },
     title:{
         fontSize: size.label,
-        fontFamily: fontfamily.regular,
+        fontFamily: fontfamily.medium,
          paddingLeft:5,
        textTransform:"uppercase"
     },
     formLabal:{
-        fontSize: size.label,
-        fontFamily: fontfamily.regular,
+        fontSize: size.subtitle,
+        fontFamily: fontfamily.medium,
         color:"#000"
     },
     textinput:{
-        fontSize: size.label,
-        fontFamily: fontfamily.regular,
-         paddingLeft:15,
-         paddingRight:30,
+        fontSize: size.subtitle,
+        fontFamily: fontfamily.medium,
+        paddingLeft:15,
+        paddingRight:30,
         borderRadius:2,
         borderColor:"#000",
         borderWidth:2,
@@ -118,15 +121,15 @@ const styles = StyleSheet.create({
         borderRadius:10
       },
       successtxt:{
-          fontFamily: fontfamily.light,
+          fontFamily: fontfamily.regular,
           fontSize:26,
           color:"#000",
           marginTop:10
       },
       mytxt:{
-        fontFamily: fontfamily.light,
-        fontSize:size.label,
-        color:"#000",
+        fontFamily: fontfamily.regular,
+        fontSize:size.subtitle,
+        color:"#777",
         marginTop:10
       },
       okbtn:{

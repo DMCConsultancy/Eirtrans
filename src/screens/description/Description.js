@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, StatusBar, ImageBackground, ScrollView } from "react-native";
+import { Text, View, TouchableOpacity, StatusBar, ImageBackground, ScrollView,Image } from "react-native";
 import { Container, Header, Left, Right, Textarea } from "native-base";
 import styles from "./Styles";
 import { colors, images, size,fontfamily } from "../../global/globalStyle";
@@ -79,14 +79,14 @@ export default class Truckdetail extends Component {
                     <Header style={styles.headersty}>
                         <Left>
                             <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                                <Arrow name="arrow-left" size={22} color="#000" />
+                            <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                             </TouchableOpacity>
                         </Left>
 
                         <Right>
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}
                                 style={styles.rightbox} >
-                                <Text style={styles.mytext}>Home</Text>
+                                <Text style={styles.mytext}>HOME</Text>
                             </TouchableOpacity>
                         </Right>
                     </Header>
@@ -158,16 +158,17 @@ const pickerStyle = {
     inputIOS: {
         color: '#000',
         fontSize: size.subtitle,
+        fontFamily: fontfamily.medium,
     },
     inputAndroid: {
         color: '#000',
         fontSize: size.subtitle,
-        fontFamily: fontfamily.regular,
+        fontFamily: fontfamily.medium,
         paddingHorizontal: 10,
         marginTop:-5
     },
     iconContainer: {
-        top: 10,
+        top: 13,
         right: 0,
     },
     placeholder: {

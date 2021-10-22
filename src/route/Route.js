@@ -19,6 +19,7 @@ import Cars from "../screens/car/Cars";
 import Description from "../screens/description/Description";
 import Customerdetail from "../screens/customerdetail/Customerdetail";
 import NotificationDetail from "../screens/notification/NotificationDetail";
+import ViewImage from "../screens/expenses/ViewImage";
 
 const Notification_stack = createStackNavigator({
   Notification:{
@@ -34,6 +35,23 @@ const Notification_stack = createStackNavigator({
     }
   },
 })
+
+const Expenses_stack = createStackNavigator({
+  Expenses:{
+    screen:Expenses,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+  ViewImage:{
+    screen:ViewImage,
+    navigationOptions:{
+      headerShown:false
+    }
+  },
+})
+
+
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -107,7 +125,7 @@ const DrawerNavigator = createDrawerNavigator({
     screen: Notification_stack,
   },
   Expenses: {
-    screen: Expenses,
+    screen: Expenses_stack,
   },
   Contact: {
     screen: Contact,

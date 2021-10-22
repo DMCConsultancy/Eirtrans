@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, Image,Button, StatusBar, FlatList, Modal, TextInput, Dimensions, ScrollView } from "react-native";
+import { Text, View, TouchableOpacity, Image,PermissionsAndroid, StatusBar, FlatList, Modal, TextInput,Platform, Dimensions, ScrollView } from "react-native";
 import { Container, Header, Left, Right } from "native-base";
 import styles from "./Styles";
 import { colors, images } from "../../global/globalStyle";
@@ -17,7 +17,7 @@ export default class Truckdetail extends Component {
         super(props);
         this.state = {
             modalVisible_alert: false,showtxt:false,
-            messege: "",selectedItem: null,
+            messege: "",selectedItem: null,photomodal_alert:false,
             data: data,modalVisible_alert1:false,
             data1:data1, imageURI:"",screenShotmodal_alert:false
         }
@@ -26,7 +26,6 @@ export default class Truckdetail extends Component {
     formatData = (data, numColumns) => {
         if (data != undefined) {
             const numberOfFullRows = Math.floor(data.length / numColumns);
-
             let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
             while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
                 data.push({ key: `blank-${numberOfElementsLastRow}`, empty: true });
@@ -37,7 +36,6 @@ export default class Truckdetail extends Component {
     };
 
     captureScreenFunction=()=>{
- 
         captureScreen({
           format: "jpg",
           quality: 0.8
@@ -56,11 +54,95 @@ export default class Truckdetail extends Component {
            this.screenShotModal(true)
            console.log({index})
          }else{
-            this.chooseFile()
+            // this.chooseFile()
+            this.photoModal(!this.state.photomodal_alert)
          }
     }
 
-     chooseFile = () => {
+     requestCameraPermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            {
+              title: 'Camera Permission',
+              message: 'App needs camera permission',
+            },
+          );
+          // If CAMERA Permission is granted
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } catch (err) {
+          console.warn(err);
+          return false;
+        }
+      } else return true;
+    };
+  
+     requestExternalWritePermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'External Storage Write Permission',
+              message: 'App needs write permission',
+            },
+          );
+          // If WRITE_EXTERNAL_STORAGE Permission is granted
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } catch (err) {
+          console.warn(err);
+          alert('Write permission err', err);
+        }
+        return false;
+      } else return true;
+    };
+  
+
+     chooseFile = async() => {
+        let options = {
+          title: 'Select Image',
+          customButtons: [
+            {
+              name: 'customOptionKey',
+              title: 'Choose Photo from Custom Option'
+            },
+          ],
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+
+        let isCameraPermitted =  this.requestCameraPermission();
+        let isStoragePermitted =  this.requestExternalWritePermission();
+        if (isCameraPermitted && isStoragePermitted) {
+        launchCamera(options, (response) => {
+          console.log('Response = ', response);    
+          if (response.didCancel) {
+            this.photoModal(!this.state.photomodal_alert)
+            alert('User cancelled camera picker');
+          } else if (response.errorCode == 'camera_unavailable') {
+            alert('Camera not available on device');
+            this.photoModal(!this.state.photomodal_alert)
+          } else if (response.errorCode == 'permission') {
+            alert('Permission not satisfied');
+            this.photoModal(!this.state.photomodal_alert)
+          } 
+          else if (response.errorCode == 'others') {
+            alert(response.errorMessage);
+            this.photoModal(!this.state.photomodal_alert)
+          }else {
+            let source = response;
+           console.log('source',source)
+           this.setModalVisible(!this.state.modalVisible_alert);
+           this.photoModal(!this.state.photomodal_alert)
+          }
+        });
+      }
+      };
+
+      chooseFileGallery = () => {
         let options = {
           title: 'Select Image',
           customButtons: [
@@ -77,19 +159,24 @@ export default class Truckdetail extends Component {
         launchImageLibrary(options, (response) => {
           console.log('Response = ', response);    
           if (response.didCancel) {
+            this.photoModal({photomodal_alert:false})
             console.log('User cancelled image picker');
           } else if (response.error) {
+            this.photoModal({photomodal_alert:false})
             console.log('ImagePicker Error: ', response.error);
           } else if (response.customButton) {
+            this.photoModal({photomodal_alert:false})
             console.log(
               'User tapped custom button: ',
               response.customButton
             );
             alert(response.customButton);
+            this.photoModal({photomodal_alert:false})
           } else {
             let source = response;
            console.log('source',source)
            this.setModalVisible(!this.state.modalVisible_alert);
+           this.photoModal(!this.state.photomodal_alert)
           }
         });
       };
@@ -118,23 +205,27 @@ export default class Truckdetail extends Component {
         this.setState({ screenShotmodal_alert: visible });
     }
 
+    photoModal = (visible) => {
+        this.setState({photomodal_alert:visible })
+    }
+
     render() {
         const state = this.state;
         return (
             <Container style={styles.container}>
                 <StatusBar hidden />
-                <View style={[styles.container, { backgroundColor: "skyblue" }]}>
+                <View style={[styles.container, { backgroundColor: colors.skyblue }]}>
                     <Header style={styles.headersty}>
                         <Left>
                             <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                                <Icon name="arrow-left" size={22} color="#000" />
+                            <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                             </TouchableOpacity>
                         </Left>
 
                         <Right>
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}
                                 style={styles.rightbox} >
-                                <Text style={styles.text}>Home</Text>
+                                <Text style={styles.text}>HOME</Text>
                             </TouchableOpacity>
                         </Right>
                     </Header>
@@ -211,7 +302,7 @@ export default class Truckdetail extends Component {
                         <Success name="check" color={colors.primarylight} size={56} />
             <Text style={styles.successtxt}>Success!</Text>
                {this.state.showtxt==true?(
-            <Text style={styles.mytxt}>Damage details recorded successfully</Text>
+            <Text style={styles.mytxt}>Damage details recorded successfully.</Text>
             ):<Text style={styles.mytxt}></Text>}
 
             <TouchableOpacity style={styles.okbtn} 
@@ -246,6 +337,31 @@ export default class Truckdetail extends Component {
                                 }} >
                                 <Text style={[styles.formLabal,{color:"#000"}]}>Send Screenshot</Text>
                             </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.photomodal_alert}
+                    onBackdropPress={() => this.photoModal(!this.state.photomodal_alert)}
+                    onRequestClose={() => {
+                        this.photoModal(!this.state.photomodal_alert);
+                    }}>
+                    <View style={styles.center}>
+                        <View style={styles.modalView}>
+                           <Text style={styles.heading}>Take Dent Photo</Text>
+                           <TouchableOpacity onPress={()=>this.chooseFile()}
+                           style={styles.mt20}>
+                               <Text style={[styles.formLabal,{color:"#000"}]}>Take a photo</Text>
+                           </TouchableOpacity>
+
+                           <TouchableOpacity onPress={()=>this.chooseFileGallery()}
+                           style={styles.mt20}>
+                               <Text style={[styles.formLabal,{color:"#000"}]}>Pick from Gallery</Text>
+                           </TouchableOpacity>
                         </View>
                     </View>
                 </Modal>

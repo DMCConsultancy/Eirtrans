@@ -9,20 +9,24 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+     width:20,
+     height:20
+    },
     headersty:{
         backgroundColor:'transparent',
         elevation:0
     },
     rightbox:{
         borderColor:"#000",
-        borderWidth:1,
+        borderWidth:1.5,
         paddingHorizontal:20,
         paddingVertical:3,
-        borderRadius:5
+        borderRadius:3
     },
     text:{
         fontSize: size.subtitle,
-        fontFamily: fontfamily.medium,
+        fontFamily: fontfamily.bold,
         color:"#000"
     },
     imgsty:{
@@ -118,7 +122,7 @@ const styles = StyleSheet.create({
         marginTop:10
     },
     mytxt:{
-        fontFamily: fontfamily.light,
+        fontFamily: fontfamily.regular,
         fontSize:size.title,
         color:"#777",
         marginTop:10,
@@ -153,6 +157,14 @@ const styles = StyleSheet.create({
         borderColor:"#000",
         borderRadius:5,
         marginTop:10
+    },
+    heading:{
+        fontFamily: fontfamily.medium,
+        fontSize: 24,
+        color:"#000"
+    },
+    mt20:{
+        marginTop:20
     }
 })
 

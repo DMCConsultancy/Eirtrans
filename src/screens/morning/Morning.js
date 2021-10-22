@@ -92,7 +92,7 @@ export default class Morning extends Component {
             </View>
         }
         if (cellIndex == 1) {
-            return <TouchableOpacity style={[styles.center]}
+            return <TouchableOpacity style={[styles.container]}
                 onPress={() => {
                     this._alertIndex(index, cellIndex)
                     console.log({ cellIndex, index })
@@ -133,7 +133,7 @@ export default class Morning extends Component {
                 <Header style={styles.headersty}>
                     <Left>
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                            <Icon name="arrow-left" size={22} color="#000" />
+                        <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                         </TouchableOpacity>
                     </Left>
                     <Right>

@@ -1,8 +1,9 @@
 import React,{Component} from "react";
-import { Text,View,Button,TouchableOpacity, FlatList } from "react-native";
+import { Text,View,Button,TouchableOpacity, Image } from "react-native";
 import { Container, Header,Left,Right, Card, CardItem } from "native-base";
 import  Icon  from "react-native-vector-icons/Feather";
 import styles from "./Styles";
+import { images } from "../../global/globalStyle";
 
 export default class Notification extends Component{
     constructor(props){
@@ -18,7 +19,7 @@ export default class Notification extends Component{
               <Header style={styles.headersty}>
                     <Left>
                         <TouchableOpacity onPress={() => this.props.navigation.navigate("Notification")} >
-                            <Icon name="arrow-left" size={22} color="#000" />
+                        <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                         </TouchableOpacity>
                     </Left>
                   <Right/>

@@ -74,7 +74,7 @@ const pickerStyle = {
     inputAndroid: {
         color: '#000',
            fontSize: size.title,
-           fontFamily: fontfamily.regular,
+           fontFamily: fontfamily.medium,
         // borderWidth: 2
         paddingHorizontal:10,
         backgroundColor:colors.warning

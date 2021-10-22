@@ -9,20 +9,24 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+      width:20,
+      height:20
+    },
     headersty:{
         backgroundColor:'transparent',
         elevation:0
     },
     rightbox:{
         borderColor:"#000",
-        borderWidth:1,
+        borderWidth:1.5,
         paddingHorizontal:20,
         paddingVertical:3,
-        borderRadius:5
+        borderRadius:3
     },
     mytext:{
         fontSize: size.subtitle,
-        fontFamily: fontfamily.medium,
+        fontFamily: fontfamily.bold,
         color:"#000"
     },
     row:{
@@ -31,7 +35,7 @@ const styles = StyleSheet.create({
     borderStyle:{ borderColor: '#000', borderWidth: 2 },
     head: {  backgroundColor: '#fff',},
     text: { padding:10,
-    fontSize: size.label,textTransform:"uppercase",
+    fontSize: size.subtitle,textTransform:"uppercase",
     fontFamily: fontfamily.bold },
     textCell:{
         padding:10,
@@ -55,7 +59,7 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         padding:15
     },
-    btnText: { textAlign: 'center', color: '#000' , fontSize: size.label,
+    btnText: { textAlign: 'center', color: '#000' , fontSize: size.subtitle,
     fontFamily: fontfamily.regular,},
     btnsty:{
         padding:10,

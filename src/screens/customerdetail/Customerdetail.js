@@ -70,11 +70,11 @@ export default class Customerdetail extends Component {
         return (
             <Container style={styles.container}>
                 <StatusBar hidden />
-                <View style={[styles.container,{backgroundColor:"skyblue"}]}>
+                <View style={[styles.container,{backgroundColor:colors.skyblue}]}>
                     <Header style={styles.headersty}>
                         <Left>
                             <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                                <Icon name="arrow-left" size={22} color="#000" />
+                            <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                             </TouchableOpacity>
                         </Left>
 

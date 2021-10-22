@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     appButtonText: {
       fontSize: size.subtitle,
       color: "#fff",
-       fontFamily: fontfamily.regular,
+       fontFamily: fontfamily.bold,
       alignSelf: "center",
       textTransform: "uppercase",
      

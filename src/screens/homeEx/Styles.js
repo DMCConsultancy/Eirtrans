@@ -8,6 +8,10 @@ const styles = StyleSheet.create({
     content: {
         padding: 20
     },
+    arrow:{
+     width:20,
+     height:20
+    },
     headersty:{
         backgroundColor:"transparent",
         elevation:0

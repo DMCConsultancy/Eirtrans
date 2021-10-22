@@ -1,5 +1,5 @@
 import React,{Component} from "react";
-import { Text, View, TouchableOpacity,TextInput, Modal} from "react-native";
+import { Text, View, TouchableOpacity,TextInput, Modal, Image,Platform,PermissionsAndroid} from "react-native";
 import { Container, Header,Left,Right } from "native-base";
 import Arrow from "react-native-vector-icons/Feather";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -46,6 +46,45 @@ export default class Expenses extends Component{
         var strTime = hours + ':' + minutes;
         return strTime;
     }
+
+    requestCameraPermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            {
+              title: 'Camera Permission',
+              message: 'App needs camera permission',
+            },
+          );
+          // If CAMERA Permission is granted
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } catch (err) {
+          console.warn(err);
+          return false;
+        }
+      } else return true;
+    };
+  
+     requestExternalWritePermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'External Storage Write Permission',
+              message: 'App needs write permission',
+            },
+          );
+          // If WRITE_EXTERNAL_STORAGE Permission is granted
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } catch (err) {
+          console.warn(err);
+          alert('Write permission err', err);
+        }
+        return false;
+      } else return true;
+    };
 
     chooseFile = () => {
         let options = {
@@ -94,23 +133,30 @@ export default class Expenses extends Component{
             path: 'images',
           },
         };
+        let isCameraPermitted =  this.requestCameraPermission();
+        let isStoragePermitted =  this.requestExternalWritePermission();
+        if (isCameraPermitted && isStoragePermitted) {
+        
         launchCamera(options, (response) => {
-          console.log('Response = ', response);    
+          console.log('Response = ', response);
+  
           if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
-          } else if (response.customButton) {
-            console.log(
-              'User tapped custom button: ',
-              response.customButton
-            );
-            alert(response.customButton);
-          } else {
-            let source = response;
-           console.log('source',source)
+            alert('User cancelled camera picker');
+            return;
+          } else if (response.errorCode == 'camera_unavailable') {
+            alert('Camera not available on device');
+            return;
+          } else if (response.errorCode == 'permission') {
+            alert('Permission not satisfied');
+            return;
+          } else if (response.errorCode == 'others') {
+            alert(response.errorMessage);
+            return;
           }
+          console.log('base64 -> ', response);
+         
         });
+      }
       };  
 
       screenShotModal = (visible) => {
@@ -123,11 +169,11 @@ export default class Expenses extends Component{
 
     render(){
         return(
-           <Container style={[styles.container,{backgroundColor:"skyblue"}]}>
+           <Container style={[styles.container,{backgroundColor:colors.skyblue}]}>
                 <Header style={styles.headersty}>
                     <Left>
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                            <Arrow name="arrow-left" size={22} color="#000" />
+                        <Image source={images.arrow} style={styles.arrow} tintColor={'grey'}/>
                         </TouchableOpacity>
                     </Left>
                     <Right>

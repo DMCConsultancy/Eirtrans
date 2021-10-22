@@ -14,7 +14,7 @@ export default class Morning extends Component {
         super(props);
         this.state = {
             modalVisible_alert:false,
-            tableHead: ['customar name', 'modal', 'reg', 'collection address', 'lane'],
+            tableHead: ['customar name', 'model', 'reg', 'collection address', 'lane'],
             tableData: [
                 ['karl hughes', 'test', 'test', "court", "1"],
                
@@ -35,11 +35,11 @@ export default class Morning extends Component {
                 <Header style={styles.headersty}>
                     <Left>
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()} >
-                            <Icon name="arrow-left" size={22} color="#000" />
+                        <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
                         </TouchableOpacity>
                     </Left>
                     <Body style={{alignItems:"center"}}>
-                    <Text style={styles.text}>2345344</Text>
+                    <Text style={styles.text}>212345344</Text>
                         </Body>
                     <Right>
                         <TouchableOpacity onPress={()=>this.props.navigation.navigate('Home')}
