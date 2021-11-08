@@ -3,6 +3,7 @@ import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, ScrollView
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {images, colors, size, fontfamily} from "../global/globalStyle";
 import { DrawerActions } from 'react-navigation-drawer';
+import AsyncStorage from '@react-native-community/async-storage'
 
 var { width,height } = Dimensions.get('window');
 export default class CustomSidebarMenu extends Component {
@@ -88,7 +89,10 @@ export default class CustomSidebarMenu extends Component {
                     </TouchableOpacity>
                     <View style={styles.border} />
 
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Login')}
+                    <TouchableOpacity onPress={()=>{
+                      AsyncStorage.clear();
+                      this.props.navigation.navigate('Login')
+                    }}
                  style={styles.row}>
                     <View style={styles.width20}>
                     <Image source={images.logout} style={styles.imagesty} />

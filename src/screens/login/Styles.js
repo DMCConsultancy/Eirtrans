@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions,Platform } from "react-native";
 var { width } = Dimensions.get('window');
 
 import { colors, size, fontfamily } from "../../global/globalStyle";
@@ -44,6 +44,50 @@ const styles = StyleSheet.create({
     },
     mt: {
         marginTop: 90
+    },
+    iconsty:{
+        position:'absolute',
+        top:50,
+        right:0
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: '#fff',
+        padding: 25,
+        alignItems: "center",
+        justifyContent:"center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: Platform.OS == "android" ? 1 : 0.2,
+        shadowRadius: 4,
+        elevation: Platform.OS == "android" ? 5 : 0,
+        width: width-80,
+        borderRadius: 15
+      },
+      title:{
+          fontFamily: fontfamily.regular,
+          fontSize: size.title,
+          color:"#000",
+          textAlign:'center'
+      },
+      subtitle:{
+        fontFamily: fontfamily.regular,
+        fontSize: size.subtitle,
+        color:'#777',
+        textAlign:'center',
+        marginTop:10
+    },
+    btnsty:{
+        paddingHorizontal:30,
+        paddingVertical:10,
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:colors.primarylight,
+        borderRadius:5,
+        marginTop:15
     }
 })
 

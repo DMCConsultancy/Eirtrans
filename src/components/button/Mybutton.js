@@ -2,7 +2,7 @@ import React from "react";
 import {  StyleSheet, TouchableOpacity, Text, Image , View} from "react-native";
 import {colors, size,fontfamily} from "../../global/globalStyle";
 
-// TouchableOpacity.defaultProps = { activeOpacity: 0.8 };
+ TouchableOpacity.defaultProps = { activeOpacity: 0.8 };
 
 const MyButton = ({ onPress, title, backgroundColor,disabled, color, textTransform }) => (
  
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
       alignItems:"center",
       marginTop:20,
     borderRadius:5,
+    height:45
 
     },
     appButtonText: {

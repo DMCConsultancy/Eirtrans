@@ -21,7 +21,8 @@ const styles = StyleSheet.create({
         borderColor:"#000",
         borderWidth:1,
         paddingHorizontal:20,
-        paddingVertical:3
+        paddingVertical:3,
+        backgroundColor:'#fff'
     },
     head: { height: 40, backgroundColor: '#fff',},
     text: { textAlign:"center",  

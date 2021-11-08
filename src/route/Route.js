@@ -21,6 +21,7 @@ import Customerdetail from "../screens/customerdetail/Customerdetail";
 import NotificationDetail from "../screens/notification/NotificationDetail";
 import ViewImage from "../screens/expenses/ViewImage";
 
+
 const Notification_stack = createStackNavigator({
   Notification:{
     screen:Notification,
@@ -50,8 +51,6 @@ const Expenses_stack = createStackNavigator({
     }
   },
 })
-
-
 
 const HomeStack = createStackNavigator({
   Home: {

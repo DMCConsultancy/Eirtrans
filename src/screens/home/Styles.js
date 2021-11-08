@@ -73,6 +73,29 @@ const styles = StyleSheet.create({
         fontFamily:fontfamily.bold,
         fontSize: size.subtitle,
         color:"#000"
+    },
+    row:{
+        flexDirection:"row"
+    },
+    wdh90:{
+        width:"85%"
+    },
+    wdh10:{
+        width:"15%"
+    },
+    iconContainer:{
+        backgroundColor:"#fff",
+        paddingVertical: 12,
+      paddingHorizontal: 12,
+      justifyContent:'center',
+      alignItems:"center",
+      marginTop:20,
+    borderTopRightRadius:5,
+    borderBottomRightRadius:5,
+    borderLeftColor:"#ccc",
+    borderLeftWidth:1.5,
+    marginLeft:-4,
+    height:45
     }
 })
 
