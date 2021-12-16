@@ -1,25 +1,90 @@
 import React, { Component } from "react";
-import { Text, View, Button, TouchableOpacity, Image, StatusBar, Modal, ImageBackground, ScrollView } from "react-native";
-import { Container, Header, Left, Right } from "native-base";
+import { Text, View, FlatList, TouchableOpacity, Image, StatusBar, Modal, ImageBackground, ScrollView } from "react-native";
+import { Container, Header, Item, Left, Right } from "native-base";
 import styles from "./Styles";
 import { images} from "../../global/globalStyle";
 import Icon from "react-native-vector-icons/Feather";
 import Success from "react-native-vector-icons/SimpleLineIcons";
 import MyButton from "../../components/button/Mybutton";
+import { URL } from "../../../config.json";
+import Loader from "../../components/button/Loader";
+import { connect } from "react-redux";
 
-
-export default class Morning extends Component {
+class Job extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            modalVisible_alert:false
+            modalVisible_alert:false,
+            data:[],
+            currentDate:"",
+            loading:true
         }
+    }
+
+    renderItem = ({item,index}) =>{
+        return(
+            <MyButton title={item.load_title}
+            onPress={() => this.props.navigation.navigate('Testdetails',{id:item.id})}
+            backgroundColor="#fff" color="#000" textTransform="uppercase" />
+        )
     }
 
     setModalVisible = (visible) => {
         this.setState({ modalVisible_alert: visible });
+    }
+
+    getCurrentDate() {
+        const date = new Date();
+        const d = date.getDate();
+        const m = date.getMonth() + 1;
+        const y = date.getFullYear();
+        const currentDate = y + "-" + m + "-" + d
+        console.log({ currentDate })
+        this.setState({ currentDate })
+    }
+
+    async getDriverAssignToLoader() {
+        let url = URL + 'getDriverAssignToLoader'
+
+        const params = {
+            "date": this.state.currentDate,
+            "driverid": this.props.login?.data[0]?.id
         }
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params)
+        };
+
+        try {
+            let apiCall = await fetch(url, requestOptions);
+            let responseData = await apiCall.json();
+            if (responseData.response == 1) {
+                const data = responseData.data[0].loads
+                this.setState({data, loading:false})
+
+            } else {
+                console.log(responseData.message)
+                this.setState({loading:false})
+            }
+        }
+        catch (error) {
+            console.log(error)
+            this.setState({loading:false})
+        }
+    }
+
+    componentDidMount() {
+         this.getDriverAssignToLoader();
+    }
+
+    UNSAFE_componentWillMount(){
+        this.getCurrentDate();
+    }
 
     render() {
         return (
@@ -46,12 +111,15 @@ export default class Morning extends Component {
                 source={images.logo} />
             </View>
 
-            <View  style={{marginTop:"20%"}}>
-            <MyButton title="Test"
-                onPress={() => this.props.navigation.navigate('Testdetails')}
-                backgroundColor="#fff" color="#000" textTransform="uppercase" />
+                <View style={{ marginTop: "20%" }}>
+                    <FlatList data={this.state.data}
+                        renderItem={this.renderItem} />
+
                 </View>
                 </View>
+
+                 {this.state.loading==true&&
+                 <Loader/> }
               
                 </ImageBackground>
 
@@ -86,3 +154,12 @@ export default class Morning extends Component {
         )
     }
 }
+
+const mapStateToProps = state => ({ 
+    login: state.login,
+})
+
+const mapDispatchToProps = dispatch => ({})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Job)
+

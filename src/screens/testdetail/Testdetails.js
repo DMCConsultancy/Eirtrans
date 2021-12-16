@@ -1,30 +1,95 @@
 import React, { Component } from "react";
-import { Text, View, Button, TouchableOpacity, Image, StatusBar, TextInput, Modal, ImageBackground, ScrollView } from "react-native";
+import { Text, View, Button, TouchableOpacity, Image, StatusBar, TextInput, Modal, ImageBackground, ScrollView, FlatList } from "react-native";
 import { Body, Container, Header, Left, Right } from "native-base";
 import styles from "./Styles";
 import { images, size, fontfamily, colors } from "../../global/globalStyle";
 import Icon from "react-native-vector-icons/Feather";
 import Success from "react-native-vector-icons/SimpleLineIcons";
 import { Table, TableWrapper, Row, Cell, Col, Rows } from 'react-native-table-component';
+import { URL } from "../../../config.json";
+import Loader from "../../components/button/Loader";
 
-
-export default class Morning extends Component {
+export default class Test extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            modalVisible_alert:false,
+            modalVisible_alert:false,id:'',
+            data:null,
             tableHead: ['customar name', 'model', 'reg', 'collection address', 'lane'],
-            tableData: [
-                ['karl hughes', 'test', 'test', "court", "1"],
-               
-            ]
+            tableData: [],
+            loading:true
         }
     }
 
     setModalVisible = (visible) => {
         this.setState({ modalVisible_alert: visible });
    }
+
+    async getSelectedByJobCustomer() {
+        let url = URL + 'getSelectedByJobCustomer'
+
+        const params = {
+            "id": this.state.id
+        }
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params)
+        };
+        
+        try {
+            let apiCall = await fetch(url, requestOptions);
+            let responseData = await apiCall.json();
+            if (responseData.response == 1) {
+                const data = responseData.data
+                this.setState({ data,loading:false })
+
+                for (let i = 0; i < data.car_collection_data.length; i++) {
+                    var joined = this.state.tableData.concat([
+                        [
+                            data.car_collection_data[i].customer,
+                            data.car_collection_data[i].make_model,
+                            data.car_collection_data[i].reg,
+                            data.car_collection_data[i].collection_address,
+                            data.car_collection_data[i].lan
+                        ]
+                    ])
+                    
+                    this.setState({ tableData: joined })
+                    //    console.log("table data",joined)
+                }
+
+            } else {
+                this.setState({loading:false})
+                console.log(responseData.message)
+            }
+        }
+        catch (error) {
+            this.setState({loading:false})
+            console.log(error)
+        }
+    }
+
+    componentDidMount() {
+        this.getSelectedByJobCustomer();
+    }
+
+    UNSAFE_componentWillMount(){
+        const id = this.props.navigation.getParam('id',id)
+        this.setState({id})
+    }
+
+
+    getCustomerID(index){
+        console.log({index})
+        const data = this.state.data?.car_collection_data[index]
+        console.log({data})
+        this.props.navigation.navigate('Truckdetail',{info: data})
+    }
 
     render() {
         const state = this.state;
@@ -39,7 +104,7 @@ export default class Morning extends Component {
                         </TouchableOpacity>
                     </Left>
                     <Body style={{alignItems:"center"}}>
-                    <Text style={styles.text}>212345344</Text>
+                    <Text style={styles.text}>{this.state.data?.loadnumber}</Text>
                         </Body>
                     <Right>
                         <TouchableOpacity onPress={()=>this.props.navigation.navigate('Home')}
@@ -50,24 +115,32 @@ export default class Morning extends Component {
                 </Header>
 
                 <View style={styles.content}>
-                    <TouchableOpacity onPress={()=> this.props.navigation.navigate('Truckdetail')}>
+                  
                 <Table borderStyle={styles.borderStyle} >
-                                <Row data={state.tableHead} style={styles.head} textStyle={styles.text} />
+                    <Row data={state.tableHead} style={styles.head} textStyle={styles.text} />
+                    {
+                        state.tableData.map((rowData, index) => (
+                            <TableWrapper key={index} style={styles.row}>
                                 {
-                                    state.tableData.map((rowData, index) => (
-                                        <TableWrapper key={index} style={styles.row}>
-                                            {
-                                                rowData.map((cellData, cellIndex) => (
-                                                    <Cell key={cellIndex}
-                                                        data={cellData}
-                                                        textStyle={styles.textCell} />
-                                                ))
-                                            }
-                                        </TableWrapper>
+                                    rowData.map((cellData, cellIndex) => (
+                                        <Cell key={cellIndex} onPress={() => this.getCustomerID(index)}
+                                            data={cellData}
+                                            textStyle={styles.textCell} />
                                     ))
                                 }
-                 </Table>
-                 </TouchableOpacity>
+                            </TableWrapper>
+                        ))
+                    }
+                </Table>
+
+                    {/* <FlatList style={styles.borderStyle}
+                         data={this.state.data?.car_collection_data}
+                        renderItem={this.renderItem}
+                        keyExtractor={item => item.id}
+                        ListHeaderComponent={this.FlatListHeader}
+                        ListEmptyComponent={this.EmptyListMessage}
+                    /> */}
+                
 
                <View style={{alignItems:"center"}}>
                  <TouchableOpacity onPress={()=>this.setModalVisible(!this.state.modalVisible_alert)}
@@ -77,6 +150,9 @@ export default class Morning extends Component {
                  </View>
            
                 </View>
+
+                {this.state.loading==true&&
+                 <Loader/> }
               
                 </ImageBackground>
 

@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
         borderWidth:1,
         paddingHorizontal:20,
         paddingVertical:3,
-        borderRadius:5
+        borderRadius:5,
+        backgroundColor:'#fff'
     },
     text:{
         fontSize: size.subtitle,
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
         fontSize: size.label,
         fontFamily: fontfamily.medium,
         color:"#000",
-        height:35,
+        height:40,
         backgroundColor:"#fff"
     },
     mapsty:{

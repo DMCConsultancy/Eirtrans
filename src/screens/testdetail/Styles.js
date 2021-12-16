@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
         borderWidth:1.5,
         paddingHorizontal:20,
         paddingVertical:3,
-        borderRadius:3
+        borderRadius:3,
+        backgroundColor:'#fff'
     },
     text:{
         fontSize: size.label,

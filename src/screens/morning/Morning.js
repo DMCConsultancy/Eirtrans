@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Text, View, TouchableWithoutFeedback, TouchableOpacity, Image, StatusBar, TextInput, Modal, ImageBackground, ScrollView } from "react-native";
-import { Container, Header, Left, Right, Toast } from "native-base";
+import { Text, View, ActivityIndicator, TouchableOpacity, Image, StatusBar, TextInput, Modal, ImageBackground, ScrollView } from "react-native";
+import { Container, Header, Left, Right } from "native-base";
 import styles from "./Styles";
+import  Toast  from "react-native-simple-toast";
 import { images, size, fontfamily, colors } from "../../global/globalStyle";
 import Icon from "react-native-vector-icons/Feather";
 import Check from "react-native-vector-icons/Fontisto";
@@ -23,7 +24,7 @@ class Morning extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            truck: "", showChecked: "", showYes: false, Trailar: "",
+            truck: "", showChecked: "", showYes: false, Trailar: "",setYestable:[],
             remark: "", generalRemark: "", nilStatus: false, Mileage: "", modalVisible_alert: false,
             tableHead: ['Item', 'Checked', 'Remark'], trcukid: '',netVisible_alert:false,
             tableData: [], currentDate: '', message: '', acceptbtn:false,selectedUniqueItems:undefined,
@@ -37,7 +38,7 @@ class Morning extends Component {
     }
 
     setTable(){
-        const data = this.state.tableData;
+        const data =  this.props.allItem.data;
         console.log({data})
         let items = []
         for(let i=0; i<data.length; i++){
@@ -73,10 +74,13 @@ class Morning extends Component {
 
     NilStatus() {
         if (this.state.nilStatus == false) {
-            this.setState({ nilStatus: true,  showYes: true })
-
+            this.setState({ nilStatus: true})
+            this.allitem()
+            this.setState({tableData:[]})
         } else {
-            this.setState({ nilStatus: false, showYes: false })
+            this.setState({ nilStatus: false })
+            this.allitem()
+            this.setState({setYestable:[]})
         }
     }
 
@@ -161,9 +165,7 @@ class Morning extends Component {
                         : newCompanies[index][cellIndex] = "Y"
                       console.log({newCompanies})
                     this.setState({ tableData: newCompanies })
-
                    this.setTable()
-
                 }}>
                
                 {data == "0" || data == ""}
@@ -185,16 +187,16 @@ class Morning extends Component {
     }
 
     async createmorning(getdata = this.props.getMorning?.data) {
-        console.log("create morning getMorning",this.props.getdata)
+        // console.log("create morning getMorning",this.props.getdata)
         // console.log("create morning sstate",this.state)
          this.setState({acceptbtn:true})
         const { Mileage, Trailar, generalRemark, currentDate, trcukid, nilStatus,selectedUniqueItems } = this.state
         const driver_id = this.props.login?.data[0]?.id
         let nil = '';
         if (nilStatus == false) {
-            nil = 'c'
-        } else {
             nil = 'n'
+        } else {
+            nil = 'c'
         }
 
         let url = URL + 'createmorningaccepted'
@@ -225,7 +227,8 @@ class Morning extends Component {
         };
 
         this.props.getCreateMorning();
-        console.log("params=>",params)
+        // console.log("params=>",params)
+        console.log('Call createmorning accepted')
         NetInfo.fetch().then(async state => {
             if (state.isConnected == true) {
         try {
@@ -255,7 +258,8 @@ class Morning extends Component {
     }else{
            this.setState({netVisible_alert:true})
            this.setState({acceptbtn:false})
-          Toast.show('You are offline, your data is saved in local. Once you are connected to the internet your data will be sync.');
+           Toast.show('You are offline, your data is saved in local. Once you are connected to the internet your data will be sync.', Toast.LONG);
+  
     }
     })
     }
@@ -269,24 +273,39 @@ class Morning extends Component {
                 'Content-Type': 'application/json',
             },
         };
-        this.props.getAllItems()
+        this.props.getAllItems();
         try {
             let apiCall = await fetch(url, requestOptions);
             let responseData = await apiCall.json();
             if (responseData.response == 1) {
                 const data = responseData.data
-                for (let i = 0; i < data.length; i++) {
-                    var joined = this.state.tableData.concat([
-                        [
-                            data[i].name,
-                            data[i].status,
-                            "",
-                        ]
-
-                    ])
-                    this.props.setAllItems(joined)
-                    this.setState({ tableData: joined })
-                    //   console.log("table data",joined)
+                if(this.state.nilStatus==true){
+                    for (let i = 0; i < data.length; i++) {
+                        var joined = this.state.setYestable.concat([
+                            [
+                                data[i].name,
+                                'Y',
+                                "",
+                            ]   
+                        ])
+                        this.props.setAllItems(joined)
+                        this.setState({ setYestable: joined })
+                            console.log("table data",joined)
+                    }
+                }else{
+                    for (let i = 0; i < data.length; i++) {
+                        var joined = this.state.tableData.concat([
+                            [
+                                data[i].name,
+                                data[i].status,
+                                "",
+                            ]
+    
+                        ])
+                        this.props.setAllItems(joined)
+                        this.setState({ tableData: joined })
+                        //    console.log("table data",joined)
+                    }
                 }
 
             } else {
@@ -316,7 +335,7 @@ class Morning extends Component {
             if (responseData.response == 1) {
                 if(responseData.res!=null){
                 const data = responseData.res
-                    console.log("getMorningAccepted_by_id",responseData);
+                     console.log("getMorningAccepted_by_id",responseData);
                  this.setState({
                     generalRemark : data.general,
                     Trailar : data.trailerid,
@@ -351,7 +370,7 @@ class Morning extends Component {
                       trcukid:data.trcukid,selectedUniqueItems :JSON.parse(data.selectitem)
                 }
 
-                this.props.setMorningData(event);
+                // this.props.setMorningData(event);
             }
 
             } else {
@@ -407,13 +426,16 @@ class Morning extends Component {
                         </Right>
                     </Header>
                     <ScrollView keyboardShouldPersistTaps="handled">
-                        {this.props.allItem.loading == false ? (
-                            <View style={styles.content} pointerEvents={this.state.pointerEvents==true?"none":"auto"}>
+                      
+                            <View style={styles.content} 
+                             pointerEvents={this.state.pointerEvents==true?"none":"auto"}
+                            >
                                 <View >
                                     {/* <ScrollView>  */}
                                     <Table borderStyle={styles.borderStyle}>
                                         <Row data={state.tableHead} style={styles.head} textStyle={styles.text} />
                                         {
+                                              this.props.allItem.loading == false ? (
                                            this.props.allItem.data.map((rowData, index) => (
                                                 <TableWrapper key={index} style={styles.row}>
                                                     {
@@ -425,6 +447,7 @@ class Morning extends Component {
                                                     }
                                                 </TableWrapper>
                                             ))
+                                            ) : <Loader/>
                                         }
                                     </Table>
                                     {/* </ScrollView> */}
@@ -517,7 +540,7 @@ class Morning extends Component {
                                 </View>
 
                             </View>
-                        ) : <Loader />}
+                   
                     </ScrollView>
                 </ImageBackground>
 
