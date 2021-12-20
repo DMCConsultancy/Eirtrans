@@ -25,7 +25,7 @@ export default class Truckdetail extends Component {
     this.state = {
       value: '',
       showChecked: '',
-      showYes: false,
+      showYes: new Array(9).fill(null),
       selectedItem: '',
       tableHead: ['Description', 'Present'],
       tableData: [
@@ -43,8 +43,18 @@ export default class Truckdetail extends Component {
   }
 
   _alertIndex(index, cellIndex) {
-    //  alert(`This is row ${index + 1}`);
-    this.setState({showChecked: true, showYes: !this.state.showYes});
+    this.setState(state => {
+      const clonedShowYes = [...state.showYes];
+
+      clonedShowYes[index] = !clonedShowYes[index];
+
+      console.log({clonedShowYes});
+
+      return {
+        showChecked: true,
+        showYes: clonedShowYes,
+      };
+    });
   }
 
   element(cellIndex, data, index) {
@@ -54,26 +64,32 @@ export default class Truckdetail extends Component {
           style={[styles.center]}
           onPress={() => {
             this._alertIndex(index, cellIndex);
+
             this.setState({selectedItem: index});
+
             console.log({cellIndex, index});
+
             const {tableData} = this.state;
             const newCompanies = [...tableData];
-            this.state.showYes == true
+
+            this.state.showYes[index] == true
               ? (newCompanies[index][cellIndex] = 'N')
               : (newCompanies[index][cellIndex] = 'Y');
+
             console.log({newCompanies});
+
             this.setState({tableData: newCompanies});
           }}>
           {this.state.showChecked != '' ? (
-            this.state.showYes == true ? (
+            this.state.showYes[index] == true ? (
               <View style={styles.yesbtn}>
                 <Text style={styles.btnText}>Y</Text>
               </View>
-            ) : (
+            ) : this.state.showYes[index] === false ? (
               <View style={styles.nobtn}>
                 <Text style={styles.btnText}>N</Text>
               </View>
-            )
+            ) : null
           ) : null}
         </TouchableOpacity>
       );
