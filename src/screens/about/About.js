@@ -1,60 +1,73 @@
-import React,{Component} from "react";
-import { Container,Left,Right, Header, Card } from "native-base";
-import {Text,View,TouchableOpacity,Image, FlatList} from "react-native";
-import styles from "./Styles";
-import  Icon  from "react-native-vector-icons/Feather";
-import { images } from "../../global/globalStyle";
+import React, {Component} from 'react';
+import {Container, Left, Right, Card} from 'native-base';
+import {Text, View, TouchableOpacity, Image, FlatList} from 'react-native';
+import styles from './Styles';
+import Icon from 'react-native-vector-icons/Feather';
 
-export default class About extends Component{
-    constructor(){
-        super();
-        this.state={
-            data:data
-        }
-    }
+import CustomStatusBar from '../../components/StatusBar';
+import Header from '../../components/Header';
 
-    renderItem = ({item}) => {
-        return(
-            <Card style={styles.crdsty}>
-            <Image source={images.owners} style={styles.imgsty} />
-            <View style={styles.txtcontainer}>
-                <Text style={styles.txtsty}>
-                {item.text}
-                </Text>
-            </View>
-        </Card>
-        )
-    }
+import {colors, images} from '../../global/globalStyle';
+export default class About extends Component {
+  constructor() {
+    super();
+    this.state = {
+      data: data,
+    };
+  }
 
-    render(){
-        return(
-          <Container style={styles.container}>
-              <Header style={styles.headersty}>
-                  <Left>
-                      <TouchableOpacity onPress={()=>this.props.navigation.goBack()}>
-                          <Image source={images.arrow} style={styles.arrow} tintColor={'grey'} />
-                      </TouchableOpacity>
-                  </Left>
-                  <Right/>
-              </Header>
+  renderItem = ({item}) => {
+    return (
+      <Card style={styles.crdsty}>
+        <Image source={images.owners} style={styles.imgsty} />
+        <View style={styles.txtcontainer}>
+          <Text style={styles.txtsty}>{item.text}</Text>
+        </View>
+      </Card>
+    );
+  };
 
-                  <FlatList  style={[styles.content]}
-                   data={this.state.data}
-                   renderItem={this.renderItem}
-                   keyExtractor={item => item._id}
-                   ListEmptyComponent={this.EmptyListMessage}
-                   ListHeaderComponent={this.FlatListHeader} />
-            
-          </Container>
+  render() {
+    return (
+      <Container style={styles.container}>
+        <CustomStatusBar />
+        <Header>
+          <Left>
+            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+              <Image
+                source={images.arrow}
+                style={styles.arrow}
+                tintColor={colors.textDark}
+              />
+            </TouchableOpacity>
+          </Left>
+          <Right />
+        </Header>
 
-        )
-    }
+        <FlatList
+          style={[styles.content]}
+          data={this.state.data}
+          renderItem={this.renderItem}
+          keyExtractor={item => item._id}
+          ListEmptyComponent={this.EmptyListMessage}
+          ListHeaderComponent={this.FlatListHeader}
+        />
+      </Container>
+    );
+  }
 }
 
-const data=[
-    {"text": "Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type."},
-    {"text": "Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type."},
-    {"text": "Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type."},
-    {"text": "Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type."}
-
-]
+const data = [
+  {
+    text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type.',
+  },
+  {
+    text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type.',
+  },
+  {
+    text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type.',
+  },
+  {
+    text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industryLorem Ipsum has been the industry standard dummy text ever since the 1500s when an unknown printer took a galley of type.',
+  },
+];
