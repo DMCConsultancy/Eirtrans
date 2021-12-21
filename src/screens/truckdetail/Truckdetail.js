@@ -4,11 +4,12 @@ import {
   View,
   TouchableOpacity,
   Image,
-  StatusBar,
   TextInput,
   Modal,
   ImageBackground,
   ScrollView,
+  Platform,
+  Linking,
 } from 'react-native';
 import {Container, Left, Right, Textarea} from 'native-base';
 import styles from './Styles';
@@ -142,11 +143,26 @@ export default class Truckdetail extends Component {
                 </View>
               </View>
 
-              <View>
+              <TouchableOpacity
+                onPress={() => {
+                  const scheme = Platform.select({
+                    ios: 'maps:0,0?q=',
+                    android: 'geo:0,0?q=',
+                  });
+                  // const latLng = `${26.85535016139612},${80.94663768345126}`;
+                  const label = state.info?.delivery_address;
+
+                  const url = Platform.select({
+                    ios: `${scheme}${label}`,
+                    android: `${scheme}${label}`,
+                  });
+
+                  Linking.openURL(url);
+                }}>
                 {/* Todo: dynamic map */}
                 <Image source={images.map} style={styles.mapsty} />
                 <Text style={styles.maptxtsty}>tap here for go on map </Text>
-              </View>
+              </TouchableOpacity>
 
               <View>
                 <View style={styles.cardsty}>
