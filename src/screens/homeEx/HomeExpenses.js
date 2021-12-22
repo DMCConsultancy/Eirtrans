@@ -8,6 +8,8 @@ import {
   Image,
   Platform,
   PermissionsAndroid,
+  Appearance,
+  Alert,
 } from 'react-native';
 import {Container, Left, Right} from 'native-base';
 import Arrow from 'react-native-vector-icons/Feather';
@@ -22,6 +24,8 @@ import Success from 'react-native-vector-icons/SimpleLineIcons';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+
+const colorScheme = Appearance.getColorScheme();
 export default class Expenses extends Component {
   constructor(props) {
     super(props);
@@ -224,6 +228,7 @@ export default class Expenses extends Component {
               placeholder="Enter Amount"
               style={styles.input}
               value={this.state.amount}
+              keyboardType="numeric"
               onChangeText={amount => this.setState({amount})}
             />
           </View>
@@ -250,7 +255,9 @@ export default class Expenses extends Component {
             <View style={{width: '50%'}}>
               <Text style={styles.title}>Time</Text>
               <View style={styles.datePicker}>
-                <View style={styles.row}>
+                <TouchableOpacity
+                  style={styles.row}
+                  onPress={() => this.setState({isDatePickerVisible: true})}>
                   <View style={{width: '85%'}}>
                     <Text>{this.time(this.state.time)}</Text>
                   </View>
@@ -259,7 +266,7 @@ export default class Expenses extends Component {
                     style={{width: '15%'}}>
                     <Arrow name="clock" size={20} color="#777" />
                   </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               </View>
               <DateTimePickerModal
                 isVisible={this.state.isDatePickerVisible}
@@ -312,7 +319,11 @@ export default class Expenses extends Component {
           animationType="slide"
           transparent={true}
           visible={this.state.modal_alert}
-          onBackdropPress={() => this.screenShotModal(!this.state.modal_alert)}
+          style={{backgroundColor: 'red'}}
+          onBackdropPress={() => {
+            console.log('backdroppress');
+            this.screenShotModal(!this.state.modal_alert);
+          }}
           onRequestClose={() => {
             this.screenShotModal(!this.state.modal_alert);
           }}>
@@ -381,21 +392,41 @@ export default class Expenses extends Component {
 }
 
 const items = [
-  {label: 'OIL', value: 'OIL'},
-  {label: 'STORAGE', value: 'STORAGE'},
-  {label: 'FUEL', value: 'FUEL'},
-  {label: 'TOLL', value: 'TOLL'},
-  {label: 'MISC', value: 'MISC'},
+  {
+    label: 'OIL',
+    value: 'OIL',
+    // color: colorScheme === 'dark' ? '#fff' : '#333'
+  },
+  {
+    label: 'STORAGE',
+    value: 'STORAGE',
+    // color: colorScheme === 'dark' ? '#fff' : '#333',
+  },
+  {
+    label: 'FUEL',
+    value: 'FUEL',
+    // color: colorScheme === 'dark' ? '#fff' : '#333',
+  },
+  {
+    label: 'TOLL',
+    value: 'TOLL',
+    // color: colorScheme === 'dark' ? '#fff' : '#333',
+  },
+  {
+    label: 'MISC',
+    value: 'MISC',
+    // color: colorScheme === 'dark' ? '#fff' : '#333',
+  },
 ];
 
 const pickerStyle = {
   inputIOS: {
-    color: '#000',
+    color: '#333',
     fontSize: size.subtitle,
     //   fontFamily: fontfamily.roboto
   },
   inputAndroid: {
-    color: '#000',
+    color: '#333',
     backgroundColor: '#fff',
     fontSize: size.subtitle,
     fontFamily: fontfamily.regular,

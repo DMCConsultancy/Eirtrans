@@ -208,7 +208,7 @@ class Morning extends Component {
   element(cellIndex, data, index) {
     if (cellIndex == 2) {
       return (
-        <View style={{alignItems: 'center'}}>
+        <View style={{paddingLeft: 5}}>
           <TextInput
             style={styles.input}
             value={data}

@@ -30,7 +30,7 @@ export default class Truckdetail extends Component {
       form: '',
       to: '',
       btnclr: false,
-      messege: 'NA',
+      messege: '',
       loading: true,
       info: null,
       data: [],
@@ -228,7 +228,7 @@ export default class Truckdetail extends Component {
                       style={styles.textarea}
                       disabled={true}
                       value={state.data[0]?.additional_comment}
-                      //onChangeText={(messege)=>this.setState({messege})}
+                      onChangeText={(messege)=>this.setState({messege})}
                     />
                   </View>
                 </View>
