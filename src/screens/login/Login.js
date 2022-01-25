@@ -43,7 +43,7 @@ class Login extends Component {
   }
 
   async alldriver() {
-    let url = URL + 'alldriver';
+    let url = URL + 'getAllDrivers';
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -57,7 +57,7 @@ class Login extends Component {
       let responseData = await apiCall.json();
       if (responseData.response == 1) {
         const data = responseData.data;
-        // console.log({ data })
+
         const driver = [];
         for (let i = 0; i < data.length; i++) {
           let obj = {
@@ -87,18 +87,27 @@ class Login extends Component {
 
   async loginHandle() {
     const {data, pin, selectedDriver} = this.state;
-    let url = URL + 'login';
+
+    let url = URL + 'loginDriver';
+
     this.setState({loginStatus: true});
+
     if (selectedDriver !== '' && pin !== '') {
       const params = {
+        id: data[0]?.id,
         name: data[0]?.label,
-        pincode: data[0]?.pincode,
+        driver_status: data[0]?.driver_status,
         token: data[0]?.token,
         ip: data[0]?.ip,
+        appversion: data[0]?.appversion,
         deviceid: data[0]?.deviceid,
         type: data[0]?.type,
-        appversion: data[0]?.appversion,
+        pincode: pin,
+        mobile: data[0]?.mobile,
       };
+
+      // console.log(JSON.stringify({params}, null, 4));
+
       const requestOptions = {
         method: 'POST',
         headers: {
@@ -107,41 +116,61 @@ class Login extends Component {
         },
         body: JSON.stringify(params),
       };
+
       this.props.getLogin();
+
       if (this.props.netConnection.data == true) {
         try {
           let apiCall = await fetch(url, requestOptions);
           let responseData = await apiCall.json();
 
+          console.log(JSON.stringify({responseData}, null, 4));
+
           if (responseData.response === 1) {
             this.validation();
+
             const token = responseData.data[0]?.token;
             const data = responseData.data;
+
             this.props.setLogin(data);
+
             AsyncStorage.setItem('token', token);
+
             this.props.navigation.navigate('Home');
+
             Toast.show(responseData.message);
+
             console.log(responseData.message);
+
             this.setState({loginStatus: false});
           } else {
             this.loginModal(!this.state.visible);
+
             this.setState({message: responseData.message});
+
             this.props.loginError(responseData.message);
+
             this.setState({loginStatus: false});
           }
         } catch (error) {
           console.log(error);
+
           this.props.loginError(error);
+
           this.setModalVisible(!this.state.modalVisible_alert);
+
           this.setState({loginStatus: false});
         }
       } else {
         this.setModalVisible(!this.state.modalVisible_alert);
+
         this.setState({loginStatus: false});
       }
     } else {
       this.validation();
+
       console.log({pin, selectedDriver});
+
       this.setState({loginStatus: false});
     }
   }

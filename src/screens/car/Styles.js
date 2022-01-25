@@ -29,6 +29,9 @@ const styles = StyleSheet.create({
         fontFamily: fontfamily.bold,
         color:"#000"
     },
+    scrollView: {
+        marginVertical: 30,
+    },
     imgsty:{
         height:250,
         width:"100%",
@@ -37,13 +40,17 @@ const styles = StyleSheet.create({
         borderRadius:3
     },
     btnsty:{
-        borderRadius:3,
-        borderColor:"#000",
+        borderRadius:5,
+        borderColor:"#888",
+        backgroundColor: colors.skyblue,
+        elevation: 10,
         borderWidth:2,
         padding:10,
+        paddingVertical: 20,
         justifyContent:"center",
         alignItems:"center",
-        marginHorizontal:5
+        marginHorizontal:5,
+        height: 100
     },
     row:{
         flex: 1,

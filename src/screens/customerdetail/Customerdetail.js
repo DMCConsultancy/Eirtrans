@@ -12,24 +12,32 @@ import {
 } from 'react-native';
 import {Container, Left, Right, Textarea} from 'native-base';
 import styles from './Styles';
-import {colors, images, size, fontfamily} from '../../global/globalStyle';
-import Icon from 'react-native-vector-icons/Feather';
+import {colors, images} from '../../global/globalStyle';
 import SignatureCapture from 'react-native-signature-capture';
 import Close from 'react-native-vector-icons/AntDesign';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
+import Toast from 'react-native-simple-toast';
+import {connect} from 'react-redux';
+
+import {URL} from '../../../config.json';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import Loader from '../../components/button/Loader';
 
-export default class Customerdetail extends Component {
+class Customerdetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
+      email: '',
       result: '',
+      notes: '',
       modalVisible_alert: false,
       modalVisible_alert1: false,
+      loading: false,
     };
   }
 
@@ -44,7 +52,7 @@ export default class Customerdetail extends Component {
   _onSaveEvent(result) {
     //result.encoded - for the base64 encoded png
     //result.pathName - for the file path name
-    console.log('mmm', result.encoded);
+    // console.log('mmm', result.encoded);
     this.setSign(result);
     this.setModalVisible(!this.state.modalVisible_alert);
   }
@@ -59,8 +67,12 @@ export default class Customerdetail extends Component {
       .catch(err => {
         console.warn(err);
       });
-    this.setState({result: result.pathName});
-    console.log(this.state.result);
+
+    PrettyPrintJSON({result});
+
+    this.setState({result: result.encoded}, () => {
+      console.log({sign: result});
+    });
   };
   _onDragEvent() {
     // This callback will be called when the user enters signature
@@ -73,6 +85,73 @@ export default class Customerdetail extends Component {
 
   setModalVisible1 = visible => {
     this.setState({modalVisible_alert1: visible});
+  };
+
+  handleSubmit = async () => {
+    const {name, email, result, notes} = this.state;
+
+    this.setState({loading: true});
+
+    const completeJobParamsFromDescription = this.props.navigation.getParam(
+      'completeJobParams',
+      null,
+    );
+
+    PrettyPrintJSON({completeJobParamsFromDescription});
+
+    // console.log({path: RNFetchBlob.wrap(result)});
+
+    let url = URL + 'completeJob';
+
+    const driver_id = this.props.login?.id;
+
+    var apiData = new FormData();
+
+    apiData.append(
+      'car_collection_id',
+      completeJobParamsFromDescription.car_collection_id,
+    );
+    apiData.append('driver_id', driver_id);
+    apiData.append('customer_id', completeJobParamsFromDescription.customer_id);
+    apiData.append('job_id', completeJobParamsFromDescription.job_id);
+
+    apiData.append('name', name);
+    apiData.append('email', email);
+    apiData.append('note', notes);
+    apiData.append(
+      'selecttool',
+      JSON.stringify(completeJobParamsFromDescription.selecttool),
+    );
+    apiData.append('carkey', 0); // ask
+
+    apiData.append('image', result);
+
+    PrettyPrintJSON({apiData});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    PrettyPrintJSON({requestOptions});
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.text();
+
+    PrettyPrintJSON({responseData});
+
+    this.setState({loading: false});
+
+    if (responseData.response === 1) {
+      console.log({createCrashReport: responseData.message});
+
+      this.setModalVisible1(!this.state.modalVisible_alert1);
+    } else {
+      console.log('complete Job', responseData.message);
+
+      Toast.show(responseData.message);
+    }
   };
 
   render() {
@@ -146,15 +225,14 @@ export default class Customerdetail extends Component {
 
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity
-                  onPress={() =>
-                    this.setModalVisible1(!this.state.modalVisible_alert1)
-                  }
+                  onPress={() => this.handleSubmit()}
                   style={styles.btnsty}>
                   <Text style={styles.mytext}>Submit</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
+          {this.state.loading && <Loader />}
         </View>
 
         <Modal
@@ -242,3 +320,11 @@ export default class Customerdetail extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  login: state.login.data,
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Customerdetail);

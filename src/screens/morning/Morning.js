@@ -48,6 +48,7 @@ import {
   MorningDataclear,
 } from '../../redux/action/setmorningdata';
 import CustomStatusBar from '../../components/StatusBar';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
 
 class Morning extends Component {
   constructor(props) {
@@ -156,8 +157,9 @@ class Morning extends Component {
     const connection = await checkInternet();
     // console.log("internet check",connection)
     if (
-      connection.isConnected == true &&
-      connection.isInternetReachable == true
+      connection.isConnected === true
+      // &&
+      // connection.isInternetReachable === true
     ) {
       this.setState({netVisible_alert: false});
     } else {
@@ -276,7 +278,7 @@ class Morning extends Component {
       nilStatus,
       selectedUniqueItems,
     } = this.state;
-    const driver_id = this.props.login?.data[0]?.id;
+    const driver_id = this.props.login?.data?.id;
     let nil = '';
     if (nilStatus == false) {
       nil = 'n';
@@ -284,7 +286,8 @@ class Morning extends Component {
       nil = 'c';
     }
 
-    let url = URL + 'createmorningaccepted';
+    let url = URL + 'createMorningAccepted';
+
     const params = {
       general: getdata?.generalRemark || generalRemark,
       trailerid: getdata?.Trailar || Trailar,
@@ -351,7 +354,8 @@ class Morning extends Component {
   }
 
   async allitem() {
-    let url = URL + 'getallitem';
+    let url = URL + 'getAllTruckAccesories';
+
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -359,7 +363,9 @@ class Morning extends Component {
         'Content-Type': 'application/json',
       },
     };
+
     this.props.getAllItems();
+
     try {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
@@ -480,6 +486,8 @@ class Morning extends Component {
 
   render() {
     const state = this.state;
+
+    console.log({net: state.netVisible_alert});
 
     return (
       <View style={styles.container}>

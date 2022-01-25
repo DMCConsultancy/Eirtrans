@@ -1,3 +1,4 @@
 {
-    "URL" : "https://eirtransapp.com/api/"
+  "URL": "https://sub.eirtransapp.com/api/",
+  "UPLOADS": "https://sub.eirtransapp.com/uploads/"
 }

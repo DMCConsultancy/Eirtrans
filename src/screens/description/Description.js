@@ -6,6 +6,7 @@ import {
   ImageBackground,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import {Container, Left, Right} from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -16,9 +17,13 @@ import {Table, TableWrapper, Row, Cell} from 'react-native-table-component';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
 
+import {URL} from '../../../config.json';
+
 import {colors, images, size, fontfamily} from '../../global/globalStyle';
 
 import styles from './Styles';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {ActionButton} from '../../components/button/ActionButton';
 export default class Truckdetail extends Component {
   constructor(props) {
     super(props);
@@ -29,18 +34,23 @@ export default class Truckdetail extends Component {
       selectedItem: '',
       tableHead: ['Description', 'Present'],
       tableData: [
-        ['V5', ''],
-        ['Service book', ''],
-        ['handbook', ''],
-        ['sealed envelope', ''],
-        ['sd card', ''],
-        ['spare wheel', ''],
-        ['parcel shelf', ''],
-        ['spare wheel tool kit', ''],
-        ['charging cable', ''],
+        // ['V5', ''],
+        // ['Service book', ''],
+        // ['handbook', ''],
+        // ['sealed envelope', ''],
+        // ['sd card', ''],
+        // ['spare wheel', ''],
+        // ['parcel shelf', ''],
+        // ['spare wheel tool kit', ''],
+        // ['charging cable', ''],
       ],
+      loading: true,
     };
   }
+
+  componentDidMount = () => {
+    this.getToolsData();
+  };
 
   _alertIndex(index, cellIndex) {
     this.setState(state => {
@@ -56,6 +66,39 @@ export default class Truckdetail extends Component {
       };
     });
   }
+
+  getToolsData = async () => {
+    let url = URL + 'allToolType';
+
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      let apiCall = await fetch(url, requestOptions);
+      let responseData = await apiCall.json();
+
+      PrettyPrintJSON({description: responseData});
+
+      if (responseData.response == 1) {
+        const data = responseData.data;
+
+        const tableData = data.map(ele => [ele.name, '']);
+
+        this.setState({tableData, loading: false});
+      } else {
+        console.log(responseData.message);
+        this.setState({loading: false});
+      }
+    } catch (error) {
+      console.log(error);
+      this.setState({loading: false});
+    }
+  };
 
   element(cellIndex, data, index) {
     if (cellIndex == 1) {
@@ -104,8 +147,29 @@ export default class Truckdetail extends Component {
     }
   }
 
+  handleNext = () => {
+    const {tableData} = this.state;
+
+    let completeJobParams = this.props.navigation.getParam(
+      'completeJobParams',
+      null,
+    );
+
+    console.log({completeJobParams});
+
+    if (!completeJobParams) {
+      console.error('completeJobParams not found in Description');
+      return;
+    }
+
+    completeJobParams['selecttool'] = tableData;
+
+    this.props.navigation.navigate('Customerdetail', {completeJobParams});
+  };
+
   render() {
-    const state = this.state;
+    const {loading, tableData, tableHead} = this.state;
+
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
@@ -155,37 +219,47 @@ export default class Truckdetail extends Component {
               </View>
 
               <View style={{marginTop: 10}}>
-                <Table borderStyle={styles.borderStyle}>
-                  <Row
-                    data={state.tableHead}
-                    style={styles.head}
-                    textStyle={[styles.text, {textTransform: 'capitalize'}]}
-                  />
-                  {state.tableData.map((rowData, index) => (
-                    <TableWrapper
-                      key={index}
-                      style={[styles.row, {backgroundColor: '#fff'}]}>
-                      {rowData.map((cellData, cellIndex) => (
-                        <Cell
-                          key={cellIndex}
-                          data={this.element(cellIndex, cellData, index)}
-                          textStyle={styles.textCell}
-                        />
-                      ))}
-                    </TableWrapper>
-                  ))}
-                </Table>
+                {loading ? (
+                  <ActivityIndicator color={colors.primary} size={'large'} />
+                ) : (
+                  <Table borderStyle={styles.borderStyle}>
+                    <Row
+                      data={tableHead}
+                      style={styles.head}
+                      textStyle={[styles.text, {textTransform: 'capitalize'}]}
+                    />
+                    {tableData.map((rowData, index) => (
+                      <TableWrapper
+                        key={index}
+                        style={[styles.row, {backgroundColor: '#fff'}]}>
+                        {rowData.map((cellData, cellIndex) => (
+                          <Cell
+                            key={cellIndex}
+                            data={this.element(cellIndex, cellData, index)}
+                            textStyle={styles.textCell}
+                          />
+                        ))}
+                      </TableWrapper>
+                    ))}
+                  </Table>
+                )}
               </View>
 
-              <View style={{alignItems: 'center'}}>
+              {/* <View style={{alignItems: 'center'}}>
                 <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('Customerdetail')
-                  }
+                  onPress={() => {
+                    this.handleNext();
+                  }}
                   style={styles.btnsty}>
                   <Text style={styles.mytext}>Next</Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
+              <ActionButton
+                onPress={() => {
+                  this.handleNext();
+                }}
+                title={'Next'}
+              />
             </View>
           </ScrollView>
         </ImageBackground>

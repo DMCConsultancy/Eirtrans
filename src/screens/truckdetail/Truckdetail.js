@@ -21,13 +21,14 @@ import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
 
 export default class Truckdetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modalVisible_alert: false,
-      form: '',
+      from: '', // Todo: add user's current location
       to: '',
       btnclr: false,
       messege: '',
@@ -81,8 +82,31 @@ export default class Truckdetail extends Component {
     this.setState({info});
   }
 
+  handleCollectYes = () => {
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    if (!loadItem) {
+      console.error('loadItem is null in TruckDetails');
+      return;
+    }
+
+    const crashReportParams = {
+      customer_id: loadItem.id,
+      car_collection_id: loadItem.job_id,
+      job_id: loadItem.job_id,
+    };
+
+    this.setModalVisible(!this.state.modalVisible_alert);
+    this.props.navigation.navigate('Cars', {crashReportParams});
+  };
+
   render() {
     const state = this.state;
+
+    const {info} = this.state;
+
+    PrettyPrintJSON(info);
+
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
@@ -112,22 +136,22 @@ export default class Truckdetail extends Component {
               <View>
                 <View style={styles.row}>
                   <View style={styles.width40}>
-                    <Text style={styles.text}>
-                      Form <Dot name="dots-two-vertical" />{' '}
+                    <Text style={styles.formLabel}>
+                      From <Dot name="dots-two-vertical" />{' '}
                     </Text>
                   </View>
                   <View style={styles.width60}>
                     <TextInput
                       style={styles.input}
-                      onChangeText={form => this.setState({form})}
-                      value={this.state.form}
+                      onChangeText={from => this.setState({from})}
+                      value={this.state.from}
                     />
                   </View>
                 </View>
 
                 <View style={[styles.row, {marginTop: 10}]}>
                   <View style={styles.width40}>
-                    <Text style={styles.text}>
+                    <Text style={styles.formLabel}>
                       To <Dot name="dots-two-vertical" />{' '}
                     </Text>
                   </View>
@@ -228,7 +252,7 @@ export default class Truckdetail extends Component {
                       style={styles.textarea}
                       disabled={true}
                       value={state.data[0]?.additional_comment}
-                      onChangeText={(messege)=>this.setState({messege})}
+                      onChangeText={messege => this.setState({messege})}
                     />
                   </View>
                 </View>
@@ -257,7 +281,10 @@ export default class Truckdetail extends Component {
                   <View style={{width: '50%'}}>
                     <TouchableOpacity
                       style={styles.btnsty}
-                      onPress={() => alert('hii')}>
+                      onPress={() => {
+                        // Todo: handle `Not collected`
+                        alert('hii');
+                      }}>
                       <Text style={styles.text}>Not Collected</Text>
                     </TouchableOpacity>
                   </View>
@@ -303,8 +330,7 @@ export default class Truckdetail extends Component {
                   <TouchableOpacity
                     style={styles.yesbtn}
                     onPress={() => {
-                      this.setModalVisible(!this.state.modalVisible_alert);
-                      this.props.navigation.navigate('Cars');
+                      this.handleCollectYes();
                     }}>
                     <Text style={styles.btntxt}>Yes</Text>
                   </TouchableOpacity>

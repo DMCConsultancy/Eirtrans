@@ -23,6 +23,8 @@ import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {ActionButton} from '../../components/button/ActionButton';
 
 export default class Test extends Component {
   constructor(props) {
@@ -48,11 +50,17 @@ export default class Test extends Component {
   };
 
   async getSelectedByJobCustomer() {
-    let url = URL + 'getSelectedByJobCustomer';
+    let url = URL + 'getJobsByLoadContainer';
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    if (!loadItem) {
+      console.log('WARN: load id not found');
+    }
 
     const params = {
-      id: this.state.id,
+      id: loadItem.id,
     };
+
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -67,22 +75,24 @@ export default class Test extends Component {
       let responseData = await apiCall.json();
       if (responseData.response == 1) {
         const data = responseData.data;
+
         this.setState({data, loading: false});
 
-        for (let i = 0; i < data.car_collection_data.length; i++) {
+        PrettyPrintJSON({loads: data});
+
+        data.car_collection_data[0].map(ele => {
           var joined = this.state.tableData.concat([
             [
-              data.car_collection_data[i].customer,
-              data.car_collection_data[i].make_model,
-              data.car_collection_data[i].reg,
-              data.car_collection_data[i].collection_address,
-              data.car_collection_data[i].lan,
+              ele.name,
+              ele.make_model,
+              ele.reg,
+              ele.collection_address,
+              ele.lane_number,
             ],
           ]);
 
           this.setState({tableData: joined});
-          //    console.log("table data",joined)
-        }
+        });
       } else {
         this.setState({loading: false});
         console.log(responseData.message);
@@ -97,16 +107,13 @@ export default class Test extends Component {
     this.getSelectedByJobCustomer();
   }
 
-  UNSAFE_componentWillMount() {
-    const id = this.props.navigation.getParam('id', id);
-    this.setState({id});
-  }
-
   getCustomerID(index) {
     console.log({index});
     const data = this.state.data?.car_collection_data[index];
-    console.log({data});
-    this.props.navigation.navigate('Truckdetail', {info: data});
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    // PrettyPrintJSON({data});
+    this.props.navigation.navigate('Truckdetail', {info: data[0], loadItem});
   }
 
   render() {
@@ -166,15 +173,12 @@ export default class Test extends Component {
                         ListEmptyComponent={this.EmptyListMessage}
                     /> */}
 
-            <View style={{alignItems: 'center'}}>
-              <TouchableOpacity
-                onPress={() =>
-                  this.setModalVisible(!this.state.modalVisible_alert)
-                }
-                style={styles.btnsty}>
-                <Text style={styles.mybtnText}>Load Collected</Text>
-              </TouchableOpacity>
-            </View>
+            <ActionButton
+              onPress={() =>
+                this.setModalVisible(!this.state.modalVisible_alert)
+              }
+              title={'Load Collected'}
+            />
           </View>
 
           {this.state.loading == true && <Loader />}

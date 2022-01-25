@@ -13,6 +13,16 @@ import {colors, images} from '../../global/globalStyle';
 
 export default class ViewImage extends Component {
   render() {
+    const {
+      navigation: {
+        state: {
+          params: {src},
+        },
+      },
+    } = this.props;
+
+    // console.log({src});
+
     return (
       <Container style={styles.container}>
         <Header style={styles.headersty}>
@@ -27,12 +37,16 @@ export default class ViewImage extends Component {
           </Left>
           <Right />
         </Header>
-        <View style={[styles.content, styles.container]}>
+        <View style={[styles.content, styles.container, styles.expenseImgCont]}>
           <ImageBackground
-            source={{
-              uri: 'https://i.pinimg.com/originals/da/6c/c6/da6cc6213d6926d317cf523e43937056.jpg',
-            }}
-            style={styles.container}
+            source={
+              typeof src === 'string'
+                ? {
+                    uri: src,
+                  }
+                : src
+            }
+            style={styles.expenseImg}
           />
         </View>
       </Container>

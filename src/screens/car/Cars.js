@@ -5,18 +5,21 @@ import {
   TouchableOpacity,
   Image,
   PermissionsAndroid,
-  StatusBar,
   FlatList,
   Modal,
   TextInput,
   Platform,
-  Dimensions,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {Container, Left, Right} from 'native-base';
 import {captureScreen} from 'react-native-view-shot';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import Toast from 'react-native-simple-toast';
+import {connect} from 'react-redux';
+
+import {URL} from '../../../config.json';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
@@ -24,11 +27,12 @@ import Header from '../../components/Header';
 import {colors, images} from '../../global/globalStyle';
 
 import styles from './Styles';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import Loader from '../../components/button/Loader';
 
 const numColumns = 3;
-const Item_wdh = Dimensions.get('window').width;
 
-export default class Truckdetail extends Component {
+class Truckdetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,6 +46,9 @@ export default class Truckdetail extends Component {
       data1: data1,
       imageURI: '',
       screenShotmodal_alert: false,
+      photos: [],
+      loading: false,
+      screenshotLoading: false,
     };
   }
 
@@ -73,13 +80,23 @@ export default class Truckdetail extends Component {
   };
 
   onPress(index) {
+    const {photos} = this.state;
+
     this.setState({selectedItem: index});
-    if (index == '11') {
+
+    console.log({index});
+
+    if (index === '11') {
       this.captureScreenFunction();
       this.screenShotModal(true);
       console.log({index});
+    } else if (index === '12') {
+      this.props.navigation.navigate('ViewCarshReport', {
+        photos,
+      });
     } else {
       // this.chooseFile()
+      // Todo: call `crashReport` API
       this.photoModal(!this.state.photomodal_alert);
     }
   }
@@ -158,6 +175,9 @@ export default class Truckdetail extends Component {
         } else {
           let source = response;
           console.log('source', source);
+
+          this.setPhotos(source);
+
           this.setModalVisible(!this.state.modalVisible_alert);
           this.photoModal(!this.state.photomodal_alert);
         }
@@ -195,26 +215,55 @@ export default class Truckdetail extends Component {
       } else {
         let source = response;
         console.log('source', source);
+
+        this.setPhotos(source);
+
         this.setModalVisible(!this.state.modalVisible_alert);
         this.photoModal(!this.state.photomodal_alert);
       }
     });
   };
 
+  setPhotos = source => {
+    PrettyPrintJSON({source});
+
+    this.setState(state => {
+      let photos = [...state.photos];
+
+      photos.push({
+        source,
+        type: data.find(ele => ele.id === state.selectedItem),
+        id: data.find(ele => ele.id === state.selectedItem).id,
+      });
+
+      return {
+        photos,
+        imageURI: source.assets[0]?.uri,
+      };
+    });
+  };
+
   ItemView = ({item, index}) => {
+    const {photos} = this.state;
+
+    const photosFound = photos.find(ele => ele.id === item.id);
+
+    // do not include buttons from button as selected item
+    const condition = photosFound && !['10', '11', '12'].includes(item.id);
+
+    // console.log({condition, photosFound});
+
     return (
       <View style={[styles.container, {marginTop: 10}]}>
-        <TouchableOpacity onPress={() => this.onPress(item.id)}>
-          <View style={styles.btnsty}>
-            <Text
-              style={
-                this.state.selectedItem === item.id
-                  ? [styles.text, {color: colors.danger}]
-                  : styles.text
-              }>
-              {item.labal}
-            </Text>
-          </View>
+        <TouchableOpacity
+          style={styles.btnsty}
+          onPress={() => this.onPress(item.id)}>
+          <Text
+            style={
+              condition ? [styles.text, {color: colors.danger}] : styles.text
+            }>
+            {item.label}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -236,8 +285,226 @@ export default class Truckdetail extends Component {
     this.setState({photomodal_alert: visible});
   };
 
+  handleCrashReport = async () => {
+    const {selectedItem, messege, imageURI} = this.state;
+
+    this.setState({
+      loading: true,
+    });
+
+    const crashReportParamsFromLoads = this.props.navigation.getParam(
+      'crashReportParams',
+      null,
+    );
+
+    PrettyPrintJSON({crashReportParamsFromLoads});
+
+    let url = URL + 'creatcrashreport';
+
+    const driver_id = this.props.login?.id;
+
+    var apiData = new FormData();
+
+    apiData.append('driver_id', driver_id);
+    apiData.append('type', selectedItem);
+    apiData.append('user_id', crashReportParamsFromLoads.customer_id);
+    apiData.append(
+      'loadcontener_id',
+      crashReportParamsFromLoads.car_collection_id,
+    );
+    apiData.append('job_id', crashReportParamsFromLoads.job_id);
+    apiData.append('details', messege);
+    apiData.append('screenshot', {
+      uri: imageURI,
+      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      type: 'image/jpg',
+    });
+    apiData.append('image', {
+      uri: imageURI,
+      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      type: 'image/jpg',
+    });
+
+    PrettyPrintJSON({
+      imageConfig: {
+        uri: imageURI,
+        name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+        type: 'image/jpg',
+      },
+    });
+
+    PrettyPrintJSON({apiData});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    PrettyPrintJSON({requestOptions});
+
+    console.log('createCrashReport');
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.json();
+
+    PrettyPrintJSON({responseData});
+
+    this.setState({
+      loading: false,
+      messege: '',
+    });
+
+    if (responseData.response === 1) {
+      console.log({createCrashReport: responseData.message});
+
+      // this.setState({showtxt: true});
+      // this.screenShotModal(!this.state.screenShotmodal_alert);
+      // this.setModal(!this.state.modalVisible_alert1);
+
+      this.setModalVisible(!this.state.modalVisible_alert);
+      this.setModal(!this.state.modalVisible_alert1);
+    } else {
+      console.log('createCrashReport else', responseData.message);
+      Toast.show(responseData.message);
+    }
+    // NetInfo.fetch().then(async state => {
+    //   if (state.isConnected == true) {
+    //     try {
+
+    //     } catch (error) {
+    //       console.log(error);
+    //       this.props.createMorningError(responseData.message);
+    //       this.setState({acceptbtn: false});
+    //     }
+    //   } else {
+    //     this.setState({netVisible_alert: true});
+    //     this.setState({acceptbtn: false});
+    //     Toast.show(
+    //       'You are offline, your data is saved in local. Once you are connected to the internet your data will be sync.',
+    //       Toast.LONG,
+    //     );
+    //   }
+    // });
+  };
+
+  handleScreenshot = async () => {
+    const {messege, imageURI} = this.state;
+
+    this.setState({
+      screenshotLoading: true,
+    });
+
+    const crashReportParamsFromLoads = this.props.navigation.getParam(
+      'crashReportParams',
+      null,
+    );
+
+    PrettyPrintJSON({crashReportParamsFromLoads});
+
+    let url = URL + 'screenshot';
+
+    const driver_id = this.props.login?.id;
+
+    var apiData = new FormData();
+
+    apiData.append('driver_id', driver_id);
+    apiData.append('user_id', crashReportParamsFromLoads.customer_id);
+    apiData.append(
+      'loadcontener_id',
+      crashReportParamsFromLoads.car_collection_id,
+    );
+    apiData.append('job_id', crashReportParamsFromLoads.job_id);
+    apiData.append('details', messege);
+    apiData.append('screenshot', {
+      uri: imageURI,
+      name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      type: 'image/jpg',
+    });
+    apiData.append('image', {
+      uri: imageURI,
+      name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      type: 'image/jpg',
+    });
+
+    PrettyPrintJSON({
+      imageConfig: {
+        uri: imageURI,
+        name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+        type: 'image/jpg',
+      },
+    });
+
+    PrettyPrintJSON({apiData});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    PrettyPrintJSON({requestOptions});
+
+    console.log('screenshot api');
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.json();
+
+    PrettyPrintJSON({responseData});
+
+    this.setState({
+      screenshotLoading: false,
+    });
+
+    if (responseData.response === 1) {
+      console.log({screenshotAPI: responseData.message});
+
+      this.setState({showtxt: true});
+      this.screenShotModal(!this.state.screenShotmodal_alert);
+      this.setModal(!this.state.modalVisible_alert1);
+
+      // this.setModalVisible(!this.state.modalVisible_alert);
+      // this.setModal(!this.state.modalVisible_alert1);
+    } else {
+      console.log('screenshotAPI else', responseData.message);
+      Toast.show(responseData.message);
+    }
+    // NetInfo.fetch().then(async state => {
+    //   if (state.isConnected == true) {
+    //     try {
+
+    //     } catch (error) {
+    //       console.log(error);
+    //       this.props.createMorningError(responseData.message);
+    //       this.setState({acceptbtn: false});
+    //     }
+    //   } else {
+    //     this.setState({netVisible_alert: true});
+    //     this.setState({acceptbtn: false});
+    //     Toast.show(
+    //       'You are offline, your data is saved in local. Once you are connected to the internet your data will be sync.',
+    //       Toast.LONG,
+    //     );
+    //   }
+    // });
+  };
+
+  redirectToDescriptionPage = () => {
+    const crashReportParamsFromLoads = this.props.navigation.getParam(
+      'crashReportParams',
+      null,
+    );
+
+    console.log({crashReportParamsFromLoads});
+
+    this.props.navigation.navigate('Description', {
+      completeJobParams: crashReportParamsFromLoads,
+    });
+  };
+
   render() {
-    const state = this.state;
+    const {screenshotLoading} = this.state;
+
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
@@ -262,10 +529,10 @@ export default class Truckdetail extends Component {
             </Right>
           </Header>
 
-          <ScrollView>
-            <View style={styles.content}>
+          <ScrollView style={styles.scrollView}>
+            {/* <View style={styles.content}>
               <Image source={images.car} style={styles.imgsty} />
-            </View>
+            </View> */}
             <FlatList
               columnWrapperStyle={styles.row}
               style={{paddingHorizontal: 15}}
@@ -278,13 +545,14 @@ export default class Truckdetail extends Component {
 
             <FlatList
               columnWrapperStyle={styles.row}
-              style={{paddingHorizontal: 15, marginTop: 20}}
+              style={{paddingHorizontal: 15, marginTop: 20, paddingBottom: 10}}
               data={this.formatData(this.state.data1, numColumns)}
               renderItem={this.ItemView}
               keyExtractor={(item, index) => index.toString()}
               numColumns={numColumns}
             />
           </ScrollView>
+          {this.state.loading == true && <Loader />}
         </View>
 
         <Modal
@@ -323,8 +591,7 @@ export default class Truckdetail extends Component {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible_alert);
-                    this.setModal(!this.state.modalVisible_alert1);
+                    this.handleCrashReport();
                   }}
                   style={[
                     styles.mybtnsty,
@@ -362,7 +629,7 @@ export default class Truckdetail extends Component {
                 onPress={() => {
                   this.setModal(!this.state.modalVisible_alert1);
                   if (this.state.showtxt == true) {
-                    this.props.navigation.navigate('Description');
+                    this.redirectToDescriptionPage();
                   }
                 }}>
                 <Text style={styles.formLabal}>Ok</Text>
@@ -390,13 +657,19 @@ export default class Truckdetail extends Component {
               <TouchableOpacity
                 style={styles.sendScreenbtn}
                 onPress={() => {
-                  this.setState({showtxt: true});
-                  this.screenShotModal(!this.state.screenShotmodal_alert);
-                  this.setModal(!this.state.modalVisible_alert1);
+                  // Todo: call API `screenshot`
+
+                  // screenshotLoading
+
+                  this.handleScreenshot();
                 }}>
-                <Text style={[styles.formLabal, {color: '#000'}]}>
-                  Send Screenshot
-                </Text>
+                {screenshotLoading ? (
+                  <ActivityIndicator color={'#000'} size={'large'} />
+                ) : (
+                  <Text style={[styles.formLabal, {color: '#000'}]}>
+                    Send Screenshot
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -436,20 +709,28 @@ export default class Truckdetail extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  login: state.login.data,
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Truckdetail);
+
 const data = [
-  {labal: 'Dent', id: '1'},
-  {labal: 'Broken', id: '2'},
-  {labal: 'Cracked', id: '3'},
-  {labal: 'Chipped', id: '4'},
-  {labal: 'Scratched', id: '5'},
-  {labal: 'Holed', id: '6'},
-  {labal: 'Missing', id: '7'},
-  {labal: 'Other', id: '8'},
-  {labal: 'Torn', id: '9'},
+  {label: 'Dent', id: '1'},
+  {label: 'Broken', id: '2'},
+  {label: 'Cracked', id: '3'},
+  {label: 'Chipped', id: '4'},
+  {label: 'Scratched', id: '5'},
+  {label: 'Holed', id: '6'},
+  {label: 'Missing', id: '7'},
+  {label: 'Other', id: '8'},
+  {label: 'Torn', id: '9'},
 ];
 
 const data1 = [
-  {labal: 'Reset', id: '10'},
-  {labal: 'Record & Continue', id: '11'},
-  {labal: 'View Photos', id: '12'},
+  {label: 'Reset', id: '10'},
+  {label: 'Record & Continue', id: '11'},
+  {label: 'View Photos', id: '12'},
 ];

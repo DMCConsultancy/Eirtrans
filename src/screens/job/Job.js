@@ -10,6 +10,7 @@ import {
   ImageBackground,
   ScrollView,
 } from 'react-native';
+import {connect} from 'react-redux';
 import {Container, Item, Left, Right} from 'native-base';
 import styles from './Styles';
 import {colors, images} from '../../global/globalStyle';
@@ -21,7 +22,7 @@ import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
 
-import {connect} from 'react-redux';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
 
 class Job extends Component {
   constructor(props) {
@@ -35,11 +36,15 @@ class Job extends Component {
   }
 
   renderItem = ({item, index}) => {
+    // PrettyPrintJSON({item});
+
     return (
       <MyButton
         title={item.load_title}
         onPress={() =>
-          this.props.navigation.navigate('Testdetails', {id: item.id})
+          this.props.navigation.navigate('Testdetails', {
+            loadItem: item,
+          })
         }
         backgroundColor="#fff"
         color="#000"
@@ -67,8 +72,12 @@ class Job extends Component {
 
     const params = {
       date: this.state.currentDate,
-      driverid: this.props.login?.data[0]?.id,
+      driverid: this.props.driverDetails.id,
     };
+
+    // console.log(JSON.stringify({params}, null, 4));
+    // return;
+
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -82,7 +91,9 @@ class Job extends Component {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
       if (responseData.response == 1) {
-        const data = responseData.data[0].loads;
+        const data = responseData.data.map(loadObj => loadObj.loads[0]);
+        PrettyPrintJSON({jobs: data});
+
         this.setState({data, loading: false});
       } else {
         console.log(responseData.message);
@@ -173,7 +184,7 @@ class Job extends Component {
 }
 
 const mapStateToProps = state => ({
-  login: state.login,
+  driverDetails: state.login.data,
 });
 
 const mapDispatchToProps = dispatch => ({});
