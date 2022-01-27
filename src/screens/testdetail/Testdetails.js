@@ -11,6 +11,8 @@ import {Body, Container, Left, Right} from 'native-base';
 import styles from './Styles';
 import {images, colors} from '../../global/globalStyle';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
+import Icon from 'react-native-vector-icons/Feather';
+
 import {
   Table,
   TableWrapper,
@@ -23,10 +25,12 @@ import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
-import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
+import {connect} from 'react-redux';
+import { style } from 'styled-system';
 
-export default class Test extends Component {
+class Loads extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -88,6 +92,9 @@ export default class Test extends Component {
               ele.reg,
               ele.collection_address,
               ele.lane_number,
+              {
+                bookingStatus: ele.bookingstatus,
+              },
             ],
           ]);
 
@@ -103,8 +110,41 @@ export default class Test extends Component {
     }
   }
 
+  async getDriverAssignToLoadertocompletejob() {
+    let url = URL + 'getDriverAssignToLoadertocompletejob';
+    const driver_id = this.props.driverDetails.id;
+
+    var apiData = new FormData();
+
+    apiData.append('driver_id', driver_id);
+    apiData.append('date', getCurrentDate(true));
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    try {
+      let apiCall = await fetch(url, requestOptions);
+      let responseData = await apiCall.json();
+
+      PrettyPrintJSON({checkStatus: responseData});
+
+      if (responseData.response == 1) {
+        const data = responseData.data;
+
+        PrettyPrintJSON({data});
+      } else {
+        console.log(responseData.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   componentDidMount() {
     this.getSelectedByJobCustomer();
+    // this.getDriverAssignToLoadertocompletejob();
   }
 
   getCustomerID(index) {
@@ -153,14 +193,26 @@ export default class Test extends Component {
               />
               {state.tableData.map((rowData, index) => (
                 <TableWrapper key={index} style={styles.row}>
-                  {rowData.map((cellData, cellIndex) => (
-                    <Cell
-                      key={cellIndex}
-                      onPress={() => this.getCustomerID(index)}
-                      data={cellData}
-                      textStyle={styles.textCell}
-                    />
-                  ))}
+                  {rowData.map((cellData, cellIndex) => {
+                    if (typeof cellData === 'object') {
+                      if (cellData.bookingStatus.toString() === '7') {
+                        return (
+                          <Icon style={styles.checkMark} name="check" size={65} color={colors.success} />
+                        );
+                      } else {
+                        return null;
+                      }
+                    }
+
+                    return (
+                      <Cell
+                        key={cellIndex}
+                        onPress={() => this.getCustomerID(index)}
+                        data={cellData}
+                        textStyle={styles.textCell}
+                      />
+                    );
+                  })}
                 </TableWrapper>
               ))}
             </Table>
@@ -213,3 +265,11 @@ export default class Test extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  driverDetails: state.login.data,
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Loads);
