@@ -84,6 +84,9 @@ export default class Truckdetail extends Component {
 
   handleCollectYes = () => {
     const loadItem = this.props.navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
+
+    PrettyPrintJSON({loadItem, info});
 
     if (!loadItem) {
       console.error('loadItem is null in TruckDetails');
@@ -92,6 +95,8 @@ export default class Truckdetail extends Component {
 
     const crashReportParams = {
       customer_id: loadItem.id,
+      load_id: info.id,
+      user_id: info.user_id,
       car_collection_id: loadItem.job_id,
       job_id: loadItem.job_id,
     };

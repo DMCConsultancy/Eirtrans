@@ -24,7 +24,7 @@ import {URL} from '../../../config.json';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
-import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
 
 class Customerdetail extends Component {
@@ -87,10 +87,67 @@ class Customerdetail extends Component {
     this.setState({modalVisible_alert1: visible});
   };
 
-  handleSubmit = async () => {
+  handleCollected = async () => {
     const {name, email, result, notes} = this.state;
 
     this.setState({loading: true});
+
+    const completeJobParamsFromDescription = this.props.navigation.getParam(
+      'completeJobParams',
+      null,
+    );
+
+    PrettyPrintJSON({completeJobParamsFromDescription});
+
+    // console.log({path: RNFetchBlob.wrap(result)});
+
+    let url = URL + 'colleted';
+
+    const driver_id = this.props.login?.id;
+    const driver_name = this.props.login?.name;
+
+    const requestObject = {
+      type: '3',
+      reason: notes,
+      name: driver_name,
+      job_id: completeJobParamsFromDescription.job_id,
+      driver_id,
+      datetime: getCurrentDate(true),
+      user_id: completeJobParamsFromDescription.user_id,
+      jobstatus: '1',
+      loadcontener_id: completeJobParamsFromDescription.load_id,
+      lan_status: '1',
+      signature: result,
+    };
+
+    PrettyPrintJSON({requestObject});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestObject),
+    };
+
+    PrettyPrintJSON({requestOptionsCollect: requestOptions});
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.json();
+
+    PrettyPrintJSON({responseData});
+
+    if (responseData.response === 1) {
+      this.handleSubmit();
+    } else {
+      Toast.show(responseData.message);
+    }
+  };
+
+  handleSubmit = async () => {
+    const {name, email, result, notes} = this.state;
 
     const completeJobParamsFromDescription = this.props.navigation.getParam(
       'completeJobParams',
@@ -107,13 +164,15 @@ class Customerdetail extends Component {
 
     var apiData = new FormData();
 
-    apiData.append(
-      'car_collection_id',
-      completeJobParamsFromDescription.car_collection_id,
-    );
-    apiData.append('driver_id', driver_id);
-    apiData.append('customer_id', completeJobParamsFromDescription.customer_id);
+    // apiData.append(
+    //   'car_collection_id',
+    //   completeJobParamsFromDescription.job_id,
+    // );
+
     apiData.append('job_id', completeJobParamsFromDescription.job_id);
+    apiData.append('driver_id', driver_id);
+    apiData.append('user_id', completeJobParamsFromDescription.user_id);
+    apiData.append('loadcontener_id', completeJobParamsFromDescription.load_id);
 
     apiData.append('name', name);
     apiData.append('email', email);
@@ -137,7 +196,7 @@ class Customerdetail extends Component {
     PrettyPrintJSON({requestOptions});
 
     let apiCall = await fetch(url, requestOptions);
-    let responseData = await apiCall.text();
+    let responseData = await apiCall.json();
 
     PrettyPrintJSON({responseData});
 
@@ -225,7 +284,7 @@ class Customerdetail extends Component {
 
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity
-                  onPress={() => this.handleSubmit()}
+                  onPress={() => this.handleCollected()}
                   style={styles.btnsty}>
                   <Text style={styles.mytext}>Submit</Text>
                 </TouchableOpacity>

@@ -307,28 +307,28 @@ class Truckdetail extends Component {
 
     apiData.append('driver_id', driver_id);
     apiData.append('type', selectedItem);
-    apiData.append('user_id', crashReportParamsFromLoads.customer_id);
+    apiData.append('user_id', crashReportParamsFromLoads.user_id);
     apiData.append(
       'loadcontener_id',
-      crashReportParamsFromLoads.car_collection_id,
+      crashReportParamsFromLoads.load_id,
     );
     apiData.append('job_id', crashReportParamsFromLoads.job_id);
     apiData.append('details', messege);
     apiData.append('screenshot', {
       uri: imageURI,
-      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
       type: 'image/jpg',
     });
     apiData.append('image', {
       uri: imageURI,
-      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
       type: 'image/jpg',
     });
 
     PrettyPrintJSON({
       imageConfig: {
         uri: imageURI,
-        name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+        name: `${selectedItem}_${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
         type: 'image/jpg',
       },
     });
@@ -409,28 +409,28 @@ class Truckdetail extends Component {
     var apiData = new FormData();
 
     apiData.append('driver_id', driver_id);
-    apiData.append('user_id', crashReportParamsFromLoads.customer_id);
+    apiData.append('user_id', crashReportParamsFromLoads.user_id);
     apiData.append(
       'loadcontener_id',
-      crashReportParamsFromLoads.car_collection_id,
+      crashReportParamsFromLoads.load_id,
     );
     apiData.append('job_id', crashReportParamsFromLoads.job_id);
     apiData.append('details', messege);
     apiData.append('screenshot', {
       uri: imageURI,
-      name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      name: `${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
       type: 'image/jpg',
     });
     apiData.append('image', {
       uri: imageURI,
-      name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+      name: `${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
       type: 'image/jpg',
     });
 
     PrettyPrintJSON({
       imageConfig: {
         uri: imageURI,
-        name: `${driver_id}_${crashReportParamsFromLoads.customer_id}_screenshot.jpg`,
+        name: `${driver_id}_${crashReportParamsFromLoads.user_id}_screenshot.jpg`,
         type: 'image/jpg',
       },
     });

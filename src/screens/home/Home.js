@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {Container} from 'native-base';
 import {DrawerActions} from 'react-navigation-drawer';
+import {NavigationEvents} from 'react-navigation';
 import Toast from 'react-native-simple-toast';
 
 import {images, colors} from '../../global/globalStyle';
@@ -42,6 +43,8 @@ import CustomStatusBar from '../../components/StatusBar';
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 
 class Home extends Component {
+  _unsubscribe;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -180,7 +183,7 @@ class Home extends Component {
     const params = {
       driver_id: driver_id,
       truck_number: selectedTruckNumber,
-      currenttdate: getCurrentDate(),
+      currenttdate: getCurrentDate(true),
       mobile: driver_mobile,
       drivername: driver_name,
       id: selectedTruck.id,
@@ -226,11 +229,33 @@ class Home extends Component {
     }
   }
 
+  subscribeToFocusEvent = () => {
+    const {navigation} = this.props;
+
+    console.log('INFO: subscribing to navigation focus event');
+
+    this._unsubscribe = navigation.addListener('focus', () => {
+      console.log('component appeared');
+      this.checkMorningAccepted();
+    });
+    console.log({subscribe: this._unsubscribe});
+  };
+
   componentDidMount() {
     this.truckdetails();
     this.checkMorningAccepted();
-    // console.log('login', this.props.createMorning);
+    // this.subscribeToFocusEvent();
   }
+
+  unsubscribeFocusEvent = () => {
+    console.log('INFO: unsubscribing to navigation focus event');
+
+    if (this._unsubscribe) {
+      console.log({unsubs: this._unsubscribe});
+
+      this._unsubscribe.remove();
+    }
+  };
 
   morningCheck() {
     if (this.props.createMorning.data.response !== 1) {
@@ -243,10 +268,16 @@ class Home extends Component {
   render() {
     const {morningCheckLoader, morningAccepted} = this.state;
 
-    // console.log({morningAccepted});
+    console.log({condition: morningAccepted ? false : true});
 
     return (
       <Container style={styles.container}>
+        {/* naviagtion events to refresh morning status */}
+        <NavigationEvents
+          onDidFocus={() => this.subscribeToFocusEvent()}
+          onWillBlur={() => this.unsubscribeFocusEvent()}
+        />
+        {/* =========================================== */}
         <CustomStatusBar />
         <ImageBackground source={images.bg} style={styles.container}>
           <View style={styles.content}>
@@ -318,7 +349,8 @@ class Home extends Component {
               <MyButton
                 title="Jobs"
                 disabled={
-                  this.props.createMorning.data.response !== 1 ? true : false
+                  // this.props.createMorning.data.response !== 1 ? true : false
+                  morningAccepted ? false : true
                 }
                 onPress={() => {
                   if (this.props.createMorning.data.response === 1) {
@@ -328,14 +360,16 @@ class Home extends Component {
                 backgroundColor="#fff"
                 textTransform="capitalize"
                 color={
-                  this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
+                  // this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
+                  !morningAccepted ? '#ccc' : '#000'
                 }
               />
 
               <MyButton
                 title="Expenses"
                 disabled={
-                  this.props.createMorning.data.response !== 1 ? true : false
+                  // this.props.createMorning.data.response !== 1 ? true : false
+                  morningAccepted ? false : true
                 }
                 onPress={() => {
                   if (this.props.createMorning.data.response === 1) {
@@ -345,7 +379,8 @@ class Home extends Component {
                 backgroundColor="#fff"
                 textTransform="capitalize"
                 color={
-                  this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
+                  // this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
+                  !morningAccepted ? '#ccc' : '#000'
                 }
               />
             </View>

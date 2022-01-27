@@ -48,7 +48,7 @@ import {
   MorningDataclear,
 } from '../../redux/action/setmorningdata';
 import CustomStatusBar from '../../components/StatusBar';
-import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 
 class Morning extends Component {
   constructor(props) {
@@ -294,7 +294,7 @@ class Morning extends Component {
       mileage: getdata?.Mileage || Mileage,
       trcukid: getdata?.trcukid || trcukid,
       trucknumber: this.props.SelectedTruckDetail?.data,
-      datetime: getdata?.currentDate || currentDate,
+      datetime: getCurrentDate(true),
       driver_id: driver_id,
       nil: nil,
       selectitem: getdata?.selectedUniqueItems || selectedUniqueItems,
@@ -305,6 +305,9 @@ class Morning extends Component {
         delete params[key];
       }
     }
+
+    PrettyPrintJSON({morningParams: params});
+
     const requestOptions = {
       method: 'POST',
       headers: {
