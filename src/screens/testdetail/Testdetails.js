@@ -28,7 +28,7 @@ import Header from '../../components/Header';
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
 import {connect} from 'react-redux';
-import { style } from 'styled-system';
+import {style} from 'styled-system';
 
 class Loads extends Component {
   constructor(props) {
@@ -142,6 +142,47 @@ class Loads extends Component {
     }
   }
 
+  handleLoadCollectedPress = async () => {
+    let url = URL + 'loadcomplete';
+
+    this.setState({loading: true});
+
+    const driver_id = this.props.driverDetails.id;
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    var apiData = new FormData();
+
+    apiData.append('id', loadItem.id);
+    apiData.append('driver_id', driver_id);
+    apiData.append('deliverytype', '');
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    try {
+      let apiCall = await fetch(url, requestOptions);
+      let responseData = await apiCall.json();
+
+      PrettyPrintJSON({handleLoadCollectedPress: responseData});
+
+      this.setState({loading: false});
+
+      if (responseData.response == 1) {
+        const data = responseData.data;
+
+        PrettyPrintJSON({handleLoadCollectedPressData: data});
+
+        this.setModalVisible(!this.state.modalVisible_alert);
+      } else {
+        console.log(responseData.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   componentDidMount() {
     this.getSelectedByJobCustomer();
     // this.getDriverAssignToLoadertocompletejob();
@@ -194,10 +235,17 @@ class Loads extends Component {
               {state.tableData.map((rowData, index) => (
                 <TableWrapper key={index} style={styles.row}>
                   {rowData.map((cellData, cellIndex) => {
-                    if (typeof cellData === 'object') {
+                    // console.log({cellData});
+
+                    if (cellData && typeof cellData === 'object') {
                       if (cellData.bookingStatus.toString() === '7') {
                         return (
-                          <Icon style={styles.checkMark} name="check" size={65} color={colors.success} />
+                          <Icon
+                            style={styles.checkMark}
+                            name="check"
+                            size={65}
+                            color={colors.success}
+                          />
                         );
                       } else {
                         return null;
@@ -226,9 +274,7 @@ class Loads extends Component {
                     /> */}
 
             <ActionButton
-              onPress={() =>
-                this.setModalVisible(!this.state.modalVisible_alert)
-              }
+              onPress={() => this.handleLoadCollectedPress()}
               title={'Load Collected'}
             />
           </View>
