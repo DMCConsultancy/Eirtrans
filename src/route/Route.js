@@ -21,6 +21,7 @@ import Description from '../screens/description/Description';
 import Customerdetail from '../screens/customerdetail/Customerdetail';
 import NotificationDetail from '../screens/notification/NotificationDetail';
 import ViewImage from '../screens/expenses/ViewImage';
+import DeliveredDetails from '../screens/DeliveredDetails/DeliveredDetails';
 
 const Notification_stack = createStackNavigator({
   Notification: {
@@ -100,6 +101,13 @@ const HomeStack = createStackNavigator({
   },
   Customerdetail: {
     screen: Customerdetail,
+    navigationOptions: {
+      headerShown: false,
+    },
+  },
+
+  DeliveredDetails: {
+    screen: DeliveredDetails,
     navigationOptions: {
       headerShown: false,
     },

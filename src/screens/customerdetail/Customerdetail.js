@@ -20,13 +20,14 @@ import Success from 'react-native-vector-icons/SimpleLineIcons';
 import Toast from 'react-native-simple-toast';
 import {connect} from 'react-redux';
 
-import {URL} from '../../../config.json';
+import {setJobStatusCompleted} from '../../redux/action/jobStatus';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
 
+import {URL} from '../../../config.json';
 class Customerdetail extends Component {
   constructor(props) {
     super(props);
@@ -149,6 +150,8 @@ class Customerdetail extends Component {
   handleSubmit = async () => {
     const {name, email, result, notes} = this.state;
 
+    const {setJobCompleted} = this.props;
+
     const completeJobParamsFromDescription = this.props.navigation.getParam(
       'completeJobParams',
       null,
@@ -206,6 +209,12 @@ class Customerdetail extends Component {
       console.log({createCrashReport: responseData.message});
 
       this.setModalVisible1(!this.state.modalVisible_alert1);
+
+      setJobCompleted({
+        job_id: completeJobParamsFromDescription.job_id,
+        load_id: completeJobParamsFromDescription.load_id,
+        status: 0,
+      });
     } else {
       console.log('complete Job', responseData.message);
 
@@ -213,7 +222,30 @@ class Customerdetail extends Component {
     }
   };
 
+  // getCollectedStatus = () => {
+  //   const completeJobParamsFromDescription = this.props.navigation.getParam(
+  //     'completeJobParams',
+  //     null,
+  //   );
+
+  //   const {jobStatus} = this.props;
+
+  //   const found = jobStatus.find(
+  //     jobs =>
+  //       jobs.job_id === completeJobParamsFromDescription.job_id &&
+  //       jobs.load_id === completeJobParamsFromDescription.load_id,
+  //   );
+
+  //   PrettyPrintJSON({getCollectedStatus: found});
+
+  //   return found ? found.status : 0;
+  // };
+
   render() {
+    // const collectedStatus = this.getCollectedStatus();
+
+    // console.log({collectedStatus});
+
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
@@ -382,8 +414,11 @@ class Customerdetail extends Component {
 
 const mapStateToProps = state => ({
   login: state.login.data,
+  jobStatus: state.jobStatus,
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  setJobCompleted: payload => dispatch(setJobStatusCompleted(payload)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Customerdetail);

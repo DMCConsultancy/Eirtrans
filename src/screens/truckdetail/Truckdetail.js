@@ -22,8 +22,9 @@ import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {connect} from 'react-redux';
 
-export default class Truckdetail extends Component {
+class Truckdetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -95,7 +96,7 @@ export default class Truckdetail extends Component {
 
     const crashReportParams = {
       customer_id: loadItem.id,
-      load_id: info.id,
+      load_id: loadItem.id,
       user_id: info.user_id,
       car_collection_id: loadItem.job_id,
       job_id: loadItem.job_id,
@@ -105,12 +106,100 @@ export default class Truckdetail extends Component {
     this.props.navigation.navigate('Cars', {crashReportParams});
   };
 
+  getIfCurrentJobCollected = () => {
+    const {jobStatus, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    let found = false;
+
+    console.log({jobStatus});
+
+    if (jobStatus) {
+      // console.log({job_id: loadItem.job_id, load_id: loadItem.id});
+
+      found = jobStatus.some(
+        jobs => jobs.job_id === loadItem.job_id && jobs.load_id === loadItem.id,
+      );
+    }
+
+    return found;
+  };
+
+  getIfCurrentJobIsLoadCollected = () => {
+    const {jobStatus, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    let found = false;
+
+    console.log({jobStatus});
+
+    if (jobStatus) {
+      // console.log({job_id: loadItem.job_id, load_id: loadItem.id});
+
+      found = jobStatus.some(
+        jobs =>
+          jobs.job_id === loadItem.job_id &&
+          jobs.load_id === loadItem.id &&
+          jobs.status === 1,
+      );
+    }
+
+    return found;
+  };
+
+  getIfCurrentJobIsDelivered = () => {
+    const {jobStatus, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    let found = false;
+
+    console.log({jobStatus});
+
+    if (jobStatus) {
+      found = jobStatus.some(
+        jobs =>
+          jobs.job_id === loadItem.job_id &&
+          jobs.load_id === loadItem.id &&
+          jobs.status === 2,
+      );
+    }
+
+    return found;
+  };
+
+  handleDelivered = () => {
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
+
+    PrettyPrintJSON({loadItem, info});
+
+    if (!loadItem) {
+      console.error('loadItem is null in handle delivered');
+      return;
+    }
+
+    const crashDeliveredDetailsParams = {
+      load_id: loadItem.id,
+      user_id: info.user_id,
+      job_id: loadItem.job_id,
+    };
+
+    this.props.navigation.navigate('DeliveredDetails', {
+      crashDeliveredDetailsParams,
+    });
+  };
+
   render() {
     const state = this.state;
 
-    const {info} = this.state;
+    const jobLoadCollected = this.getIfCurrentJobIsLoadCollected();
+    const jobCollected = this.getIfCurrentJobCollected();
+    const jobDelivered = this.getIfCurrentJobIsDelivered();
 
-    PrettyPrintJSON(info);
+    console.log({jobLoadCollected, jobDelivered, jobCollected});
 
     return (
       <Container style={styles.container}>
@@ -271,28 +360,49 @@ export default class Truckdetail extends Component {
                   <View style={{width: '50%'}}>
                     <TouchableOpacity
                       style={
-                        this.state.btnclr == true
+                        this.state.btnclr == true || jobCollected
                           ? [styles.btnsty, {backgroundColor: colors.success}]
                           : styles.btnsty
                       }
                       onPress={() => {
-                        this.setState({btnclr: true});
-                        this.setModalVisible(!this.state.modalVisible_alert);
+                        if (!jobCollected) {
+                          this.setState({btnclr: true});
+                          this.setModalVisible(!this.state.modalVisible_alert);
+                        }
                       }}>
                       <Text style={styles.text}>Collected</Text>
                     </TouchableOpacity>
                   </View>
 
-                  <View style={{width: '50%'}}>
-                    <TouchableOpacity
-                      style={styles.btnsty}
-                      onPress={() => {
-                        // Todo: handle `Not collected`
-                        alert('hii');
-                      }}>
-                      <Text style={styles.text}>Not Collected</Text>
-                    </TouchableOpacity>
-                  </View>
+                  {jobLoadCollected ? (
+                    <View style={{width: '50%'}}>
+                      <TouchableOpacity
+                        style={
+                          jobDelivered
+                            ? [styles.btnsty, {backgroundColor: colors.success}]
+                            : styles.btnsty
+                        }
+                        onPress={() => {
+                          if (!jobDelivered) {
+                            this.handleDelivered();
+                          }
+                        }}>
+                        <Text style={styles.text}>Delivered</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={{width: '50%'}}>
+                      <TouchableOpacity
+                        style={styles.btnsty}
+                        onPress={() => {
+                          console.log(
+                            'Warning: nothing happens on Not Collected',
+                          );
+                        }}>
+                        <Text style={styles.text}>Not Collected</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -348,3 +458,12 @@ export default class Truckdetail extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  driverDetails: state.login.data,
+  jobStatus: state.jobStatus,
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Truckdetail);

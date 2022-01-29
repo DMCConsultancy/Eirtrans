@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {Container} from 'native-base';
 import {DrawerActions} from 'react-navigation-drawer';
-import {NavigationEvents} from 'react-navigation';
+import {withNavigationFocus} from 'react-navigation';
 import Toast from 'react-native-simple-toast';
 
 import {images, colors} from '../../global/globalStyle';
@@ -111,14 +111,14 @@ class Home extends Component {
   checkMorningAccepted = async () => {
     let url = URL + 'getTodayCheckDetails';
 
-    // this.setState({morningAcceptedLoading: true});
+    this.setState({morningAccepted: null});
 
     const requestParams = {
       driver_id: this.props.login.data.id,
       currenttdate: getCurrentDate(true),
     };
 
-    PrettyPrintJSON({requestParams});
+    PrettyPrintJSON({getTodayCheckDetailsRequestParams: requestParams});
 
     const requestOptions = {
       method: 'POST',
@@ -133,7 +133,7 @@ class Home extends Component {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
 
-      PrettyPrintJSON({responseData});
+      PrettyPrintJSON({getTodayCheckDetailsResponseData: responseData});
 
       if (responseData.response == 1) {
         const data = responseData.data;
@@ -235,7 +235,7 @@ class Home extends Component {
     console.log('INFO: subscribing to navigation focus event');
 
     this._unsubscribe = navigation.addListener('focus', () => {
-      console.log('component appeared');
+      console.log('INFO: component appeared');
       this.checkMorningAccepted();
     });
     console.log({subscribe: this._unsubscribe});
@@ -245,6 +245,16 @@ class Home extends Component {
     this.truckdetails();
     this.checkMorningAccepted();
     // this.subscribeToFocusEvent();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      console.log('INFO: component appeared', this.props.isFocused);
+
+      if (this.props.isFocused) {
+        this.checkMorningAccepted();
+      }
+    }
   }
 
   unsubscribeFocusEvent = () => {
@@ -268,15 +278,15 @@ class Home extends Component {
   render() {
     const {morningCheckLoader, morningAccepted} = this.state;
 
-    console.log({condition: morningAccepted ? false : true});
+    console.log({morningAccepted, condition: morningAccepted ? false : true});
 
     return (
       <Container style={styles.container}>
         {/* naviagtion events to refresh morning status */}
-        <NavigationEvents
+        {/* <NavigationEvents
           onDidFocus={() => this.subscribeToFocusEvent()}
           onWillBlur={() => this.unsubscribeFocusEvent()}
-        />
+        /> */}
         {/* =========================================== */}
         <CustomStatusBar />
         <ImageBackground source={images.bg} style={styles.container}>
@@ -353,7 +363,10 @@ class Home extends Component {
                   morningAccepted ? false : true
                 }
                 onPress={() => {
-                  if (this.props.createMorning.data.response === 1) {
+                  // if (this.props.createMorning.data.response === 1) {
+                  //   this.props.navigation.navigate('Job');
+                  // }
+                  if (morningAccepted) {
                     this.props.navigation.navigate('Job');
                   }
                 }}
@@ -372,7 +385,10 @@ class Home extends Component {
                   morningAccepted ? false : true
                 }
                 onPress={() => {
-                  if (this.props.createMorning.data.response === 1) {
+                  // if (this.props.createMorning.data.response === 1) {
+                  //   this.props.navigation.navigate('HomeExpenses');
+                  // }
+                  if (morningAccepted) {
                     this.props.navigation.navigate('HomeExpenses');
                   }
                 }}
@@ -506,4 +522,7 @@ const mapDispatchToProps = dispatch => ({
   getSelectedTruckDetail: () => dispatch(getSelectedTruckDetail()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withNavigationFocus(Home));

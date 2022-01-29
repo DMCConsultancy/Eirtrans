@@ -29,6 +29,8 @@ import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
 import {connect} from 'react-redux';
 import {style} from 'styled-system';
+import {withNavigationFocus} from 'react-navigation';
+import {setJobStatusLoadCompleted} from '../../redux/action/jobStatus';
 
 class Loads extends Component {
   constructor(props) {
@@ -53,9 +55,18 @@ class Loads extends Component {
     this.setState({modalVisible_alert: visible});
   };
 
-  async getSelectedByJobCustomer() {
+  async getSelectedByJobCustomer(load = false) {
     let url = URL + 'getJobsByLoadContainer';
     const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    console.log('INFO: getting jobs ');
+
+    if (load) {
+      this.setState({
+        loading: load,
+        tableData: [],
+      });
+    }
 
     if (!loadItem) {
       console.log('WARN: load id not found');
@@ -145,14 +156,19 @@ class Loads extends Component {
   handleLoadCollectedPress = async () => {
     let url = URL + 'loadcomplete';
 
+    const {setLoadCompleted} = this.props;
+
     this.setState({loading: true});
 
     const driver_id = this.props.driverDetails.id;
     const loadItem = this.props.navigation.getParam('loadItem', null);
 
+    PrettyPrintJSON({loadItem});
+
     var apiData = new FormData();
 
-    apiData.append('id', loadItem.id);
+    // ! ask loadcontener_id must multiple
+    apiData.append('loadcontener_id', loadItem.id);
     apiData.append('driver_id', driver_id);
     apiData.append('deliverytype', '');
 
@@ -174,6 +190,12 @@ class Loads extends Component {
 
         PrettyPrintJSON({handleLoadCollectedPressData: data});
 
+        setLoadCompleted({
+          job_id: loadItem.job_id,
+          load_id: loadItem.id,
+          status: 2,
+        });
+
         this.setModalVisible(!this.state.modalVisible_alert);
       } else {
         console.log(responseData.message);
@@ -188,6 +210,16 @@ class Loads extends Component {
     // this.getDriverAssignToLoadertocompletejob();
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      console.log('INFO: Testdetails component appeared', this.props.isFocused);
+
+      if (this.props.isFocused) {
+        this.getSelectedByJobCustomer(true);
+      }
+    }
+  }
+
   getCustomerID(index) {
     console.log({index});
     const data = this.state.data?.car_collection_data[index];
@@ -197,8 +229,16 @@ class Loads extends Component {
     this.props.navigation.navigate('Truckdetail', {info: data[0], loadItem});
   }
 
+  showLoadCollected = () => {
+    const {tableData} = this.state;
+    const {jobStatus} = this.props;
+
+    return tableData.length === jobStatus.length;
+  };
+
   render() {
     const state = this.state;
+
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
@@ -235,22 +275,32 @@ class Loads extends Component {
               {state.tableData.map((rowData, index) => (
                 <TableWrapper key={index} style={styles.row}>
                   {rowData.map((cellData, cellIndex) => {
-                    // console.log({cellData});
-
                     if (cellData && typeof cellData === 'object') {
-                      if (cellData.bookingStatus.toString() === '7') {
+                      console.log({cellData});
+                      if (cellData.bookingStatus === '7') {
                         return (
                           <Icon
                             style={styles.checkMark}
                             name="check"
                             size={65}
                             color={colors.success}
+                            key={cellIndex}
                           />
                         );
                       } else {
-                        return null;
+                        return (
+                          <Icon
+                            style={styles.checkMark}
+                            name="loading2"
+                            size={0}
+                            color={'transparent'}
+                            key={cellIndex}
+                          />
+                        );
                       }
                     }
+
+                    console.log(`returning cell on index = ${cellIndex}`);
 
                     return (
                       <Cell
@@ -272,11 +322,12 @@ class Loads extends Component {
                         ListHeaderComponent={this.FlatListHeader}
                         ListEmptyComponent={this.EmptyListMessage}
                     /> */}
-
-            <ActionButton
-              onPress={() => this.handleLoadCollectedPress()}
-              title={'Load Collected'}
-            />
+            {this.showLoadCollected() && (
+              <ActionButton
+                onPress={() => this.handleLoadCollectedPress()}
+                title={'Load Collected'}
+              />
+            )}
           </View>
 
           {this.state.loading == true && <Loader />}
@@ -314,8 +365,14 @@ class Loads extends Component {
 
 const mapStateToProps = state => ({
   driverDetails: state.login.data,
+  jobStatus: state.jobStatus,
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  setLoadCompleted: payload => dispatch(setJobStatusLoadCompleted(payload)),
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Loads);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withNavigationFocus(Loads));

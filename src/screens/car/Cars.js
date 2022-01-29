@@ -256,12 +256,13 @@ class Truckdetail extends Component {
     return (
       <View style={[styles.container, {marginTop: 10}]}>
         <TouchableOpacity
-          style={styles.btnsty}
+          style={[
+            styles.btnsty,
+            condition ? {backgroundColor: colors.danger} : {},
+          ]}
           onPress={() => this.onPress(item.id)}>
           <Text
-            style={
-              condition ? [styles.text, {color: colors.danger}] : styles.text
-            }>
+            style={condition ? [styles.text, {color: '#fff'}] : styles.text}>
             {item.label}
           </Text>
         </TouchableOpacity>
@@ -308,10 +309,7 @@ class Truckdetail extends Component {
     apiData.append('driver_id', driver_id);
     apiData.append('type', selectedItem);
     apiData.append('user_id', crashReportParamsFromLoads.user_id);
-    apiData.append(
-      'loadcontener_id',
-      crashReportParamsFromLoads.load_id,
-    );
+    apiData.append('loadcontener_id', crashReportParamsFromLoads.load_id);
     apiData.append('job_id', crashReportParamsFromLoads.job_id);
     apiData.append('details', messege);
     apiData.append('screenshot', {
@@ -410,10 +408,7 @@ class Truckdetail extends Component {
 
     apiData.append('driver_id', driver_id);
     apiData.append('user_id', crashReportParamsFromLoads.user_id);
-    apiData.append(
-      'loadcontener_id',
-      crashReportParamsFromLoads.load_id,
-    );
+    apiData.append('loadcontener_id', crashReportParamsFromLoads.load_id);
     apiData.append('job_id', crashReportParamsFromLoads.job_id);
     apiData.append('details', messege);
     apiData.append('screenshot', {
@@ -685,7 +680,7 @@ class Truckdetail extends Component {
           }}>
           <View style={styles.center}>
             <View style={styles.modalView}>
-              <Text style={styles.heading}>Take Dent Photo</Text>
+              <Text style={styles.heading}>Take Damage Photo</Text>
               <TouchableOpacity
                 onPress={() => this.chooseFile()}
                 style={styles.mt20}>
