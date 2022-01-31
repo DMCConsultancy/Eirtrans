@@ -9,6 +9,7 @@ import {
   Modal,
   ActivityIndicator,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {Container} from 'native-base';
 import {DrawerActions} from 'react-navigation-drawer';
@@ -282,12 +283,6 @@ class Home extends Component {
 
     return (
       <Container style={styles.container}>
-        {/* naviagtion events to refresh morning status */}
-        {/* <NavigationEvents
-          onDidFocus={() => this.subscribeToFocusEvent()}
-          onWillBlur={() => this.unsubscribeFocusEvent()}
-        /> */}
-        {/* =========================================== */}
         <CustomStatusBar />
         <ImageBackground source={images.bg} style={styles.container}>
           <View style={styles.content}>
@@ -328,7 +323,14 @@ class Home extends Component {
               {morningAccepted === false ? (
                 <MyButton
                   title="Morning Checks"
-                  onPress={() => this.morningCheck()}
+                  onPress={() => {
+                    console.log('Morning check', morningAccepted);
+                    if (!morningAccepted) {
+                      this.morningCheck();
+                    } else {
+                      alert('Morning check already completed !');
+                    }
+                  }}
                   backgroundColor="#fff"
                   color="#000"
                   textTransform="capitalize"
@@ -338,7 +340,14 @@ class Home extends Component {
                   <View style={styles.wdh90}>
                     <MyButton
                       title="Morning Checks"
-                      onPress={() => this.morningCheck()}
+                      onPress={() => {
+                        console.log('Morning check', morningAccepted);
+                        if (!morningAccepted) {
+                          this.morningCheck();
+                        } else {
+                          alert('Morning check already completed !');
+                        }
+                      }}
                       backgroundColor="#fff"
                       color="#000"
                       textTransform="capitalize"

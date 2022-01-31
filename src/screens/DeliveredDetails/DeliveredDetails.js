@@ -63,21 +63,36 @@ class DeliveredDetails extends Component {
   }
 
   setSign = result => {
+    const crashDeliveredDetailsParamsFromTruckDetails =
+      this.props.navigation.getParam('crashDeliveredDetailsParams', null);
+
+    const {job_id, load_id} = crashDeliveredDetailsParamsFromTruckDetails;
+
+    // var Base64Code = result.encoded.split("data:image/png;base64,");
+
+    const dirs = RNFetchBlob.fs.dirs;
+    const fileName = `${job_id}_${load_id}_delivery_signature.png`;
+
+    var path = dirs.DocumentDir + `/${fileName}`;
+
     RNFetchBlob.fs
-      .writeFile(result.pathName, result.encoded, 'encoding type')
-      .then(success => {
-        console.log({success});
-        Alert.alert('info', `It's been downloaded in ${result.pathName}.`);
+      .writeFile(path, result.encoded, 'base64')
+      .then(res => {
+        console.log({res});
+        Alert.alert('info', `It's been downloaded in ${path}.`);
       })
       .catch(err => {
         console.warn(err);
       });
 
-    PrettyPrintJSON({result});
+    PrettyPrintJSON({path});
 
-    this.setState({result: result.encoded}, () => {
-      console.log({sign: result});
-    });
+    this.setState(
+      {result: {uri: 'file://' + path, name: fileName, type: 'image/png'}},
+      () => {
+        console.log({sign: result});
+      },
+    );
   };
   _onDragEvent() {
     // This callback will be called when the user enters signature
@@ -156,7 +171,6 @@ class DeliveredDetails extends Component {
 
     this.setState({loading: true});
 
-
     const crashDeliveredDetailsParamsFromTruckDetails =
       this.props.navigation.getParam('crashDeliveredDetailsParams', null);
 
@@ -199,7 +213,7 @@ class DeliveredDetails extends Component {
     PrettyPrintJSON({requestOptions});
 
     let apiCall = await fetch(url, requestOptions);
-    let responseData = await apiCall.text();
+    let responseData = await apiCall.json();
 
     PrettyPrintJSON({responseData});
 
@@ -213,7 +227,7 @@ class DeliveredDetails extends Component {
       setJobDelivered({
         job_id: crashDeliveredDetailsParamsFromTruckDetails.job_id,
         load_id: crashDeliveredDetailsParamsFromTruckDetails.load_id,
-        status: 1,
+        status: 2,
       });
     } else {
       console.log('singlejob_delivery_signature_error', responseData.message);

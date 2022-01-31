@@ -19,3 +19,12 @@ export const getCurrentDate = (padded = false) => {
 
   return currentDate;
 };
+
+export const randomHash = () => {
+  let abc = 'abcdefghijklmnopqrstuvwxyz1234567890'.split('');
+  var token = '';
+  for (let i = 0; i < 32; i++) {
+    token += abc[Math.floor(Math.random() * abc.length)];
+  }
+  return token; //Will return a 32 bit "hash"
+};

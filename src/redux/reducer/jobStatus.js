@@ -19,9 +19,9 @@ cloneDeep;
  *
  * 0 => collected
  *
- * 1 => delivered
+ * 1 => load collected
  *
- * 2 => load collected
+ * 2 => delivered
  *
  * 3 => screenshot sent
  *
@@ -66,18 +66,11 @@ const jobStaus = (state = INITIAL_STATE, action) => {
 
       const updatedState_JOB_LOAD_COMPLETED =
         clonedState_JOB_LOAD_COMPLETED.map(ele => {
-          if (
-            ele.job_id === action.payload.job_id &&
-            ele.load_id === action.payload.load_id
-          ) {
-            const clonedEle = {...ele};
+          const clonedEle = {...ele};
 
-            clonedEle.status = 1;
+          clonedEle.status = 1;
 
-            return clonedEle;
-          }
-
-          return ele;
+          return clonedEle;
         });
 
       return updatedState_JOB_LOAD_COMPLETED;

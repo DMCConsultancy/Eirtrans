@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { paddingTop } from "styled-system";
 import { colors, fontfamily, size } from "../../global/globalStyle";
 
 const styles = StyleSheet.create({
@@ -15,7 +16,8 @@ const styles = StyleSheet.create({
     },
     headersty:{
         backgroundColor:"transparent",
-        elevation:0
+        elevation:0,
+        paddingTop: 50
     },
     title:{
         fontFamily: fontfamily.regular,

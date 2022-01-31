@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     height: 40,
     backgroundColor: '#fff',
+    color: '#000',
   },
   mt20: {
     marginTop: 20,

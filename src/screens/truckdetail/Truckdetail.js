@@ -142,7 +142,7 @@ class Truckdetail extends Component {
         jobs =>
           jobs.job_id === loadItem.job_id &&
           jobs.load_id === loadItem.id &&
-          jobs.status === 1,
+          jobs.status >= 1,
       );
     }
 
@@ -163,7 +163,7 @@ class Truckdetail extends Component {
         jobs =>
           jobs.job_id === loadItem.job_id &&
           jobs.load_id === loadItem.id &&
-          jobs.status === 2,
+          jobs.status >= 2,
       );
     }
 

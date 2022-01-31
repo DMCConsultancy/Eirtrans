@@ -197,7 +197,7 @@ class Morning extends Component {
       nilStatus,
       selectedUniqueItems,
     };
-    this.props.setMorningData(data);
+    // this.props.setMorningData(data);
 
     if (Trailar != '' && Mileage != '') {
       this.validation();
@@ -326,7 +326,7 @@ class Morning extends Component {
           let apiCall = await fetch(url, requestOptions);
           let responseData = await apiCall.json();
           if (responseData.response === 1) {
-            this.props.setCreateMorning(responseData);
+            // this.props.setCreateMorning(responseData);
             console.log('createmorningaccepted', responseData.message);
 
             this.setState({message: responseData.message, acceptbtn: false});
@@ -358,6 +358,10 @@ class Morning extends Component {
 
   async allitem() {
     let url = URL + 'getAllTruckAccesories';
+
+    this.setState({setYestable: []});
+    this.setState({tableData: []});
+
 
     const requestOptions = {
       method: 'GET',
@@ -716,7 +720,7 @@ const mapStateToProps = state => ({
   truckDetail: state.truckDetail,
   login: state.login,
   SelectedTruckDetail: state.SelectedTruckDetail,
-  getMorning: state.getMorning,
+  getMorning: {data: null},
   createMorning: state.createMorning,
 });
 

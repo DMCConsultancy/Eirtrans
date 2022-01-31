@@ -30,6 +30,7 @@ import Header from '../../components/Header';
 
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import {setJobStatusFinalTruckScreenshot} from '../../redux/action/jobStatus';
+import Toast from 'react-native-simple-toast';
 
 class Job extends Component {
   constructor(props) {
@@ -57,7 +58,16 @@ class Job extends Component {
     const {jobStatus} = this.props;
 
     if (!isEqual(prevProps.jobStatus, jobStatus)) {
-      this.setState(state => ({refresh: !state.refresh}));
+      let truckPicUpdated = false;
+
+      if (jobStatus) {
+        truckPicUpdated = jobStatus.every(jobs => jobs.status === 3);
+      }
+
+      this.setState(state => ({
+        refresh: !state.refresh,
+        showScreenshotLinks: !truckPicUpdated,
+      }));
     }
   };
 
@@ -201,7 +211,7 @@ class Job extends Component {
 
     console.log({collectedStatus});
 
-    if (collectedStatus === 2) {
+    if (collectedStatus >= 2) {
       return (
         <View style={styles.row}>
           <View style={styles.wdh90}>
@@ -244,8 +254,12 @@ class Job extends Component {
   checkIfLoadIsCollected = item => {
     const {jobStatus} = this.props;
 
+    console.log('checking If Load Is Collected...');
+
     let found = false;
     let truckPicUpdated = false;
+
+    // console.log({jobStatus});
 
     if (jobStatus) {
       found = jobStatus.find(
@@ -253,11 +267,12 @@ class Job extends Component {
       );
 
       truckPicUpdated = jobStatus.every(jobs => jobs.status === 3);
+
+      // console.log({truckPicUpdated, status: found.status});
     }
 
     // if load collected by truck Pic is not updated show `Take Truck` link
-    // ! remove not (!) from below after testing
-    if (found && found.status !== 2 && !truckPicUpdated) {
+    if (found && found.status >= 2 && !truckPicUpdated) {
       this.setState({showScreenshotLinks: true});
     }
 
@@ -338,7 +353,7 @@ class Job extends Component {
 
   handleUploadImage = async () => {
     const {truckImage} = this.state;
-    const {setJobStatustoScreenshot} = this.props;
+    const {setJobStatustoScreenshot, jobStatus} = this.props;
 
     this.setState({
       screenshotLoading: true,
@@ -346,7 +361,7 @@ class Job extends Component {
 
     let url = URL + 'finaltruck_screenshot';
 
-    const driver_id = this.props.login?.id;
+    const driver_id = this.props.driverDetails?.id;
 
     const date = getCurrentDate(true);
 
@@ -456,6 +471,7 @@ class Job extends Component {
               />
             </View>
             {showScreenshotLinks && <RenderScreenshotLinks />}
+            {/* <RenderScreenshotLinks /> */}
           </View>
 
           {this.state.loading == true && <Loader />}

@@ -24,8 +24,11 @@ import Toast from 'react-native-simple-toast';
 import Error from 'react-native-vector-icons/MaterialIcons';
 import Close from 'react-native-vector-icons/SimpleLineIcons';
 import AsyncStorage from '@react-native-community/async-storage';
+import {getDeviceId} from 'react-native-device-info';
 import {getLogin, setLogin, loginError} from '../../redux/action/login';
 import CustomStatusBar from '../../components/StatusBar';
+
+import {PrettyPrintJSON, randomHash} from '../../utils/helperFunctions';
 
 class Login extends Component {
   constructor(props) {
@@ -88,6 +91,10 @@ class Login extends Component {
   async loginHandle() {
     const {data, pin, selectedDriver} = this.state;
 
+    const hash = randomHash();
+
+    console.log({hash});
+
     let url = URL + 'loginDriver';
 
     this.setState({loginStatus: true});
@@ -97,16 +104,16 @@ class Login extends Component {
         id: data[0]?.id,
         name: data[0]?.label,
         driver_status: data[0]?.driver_status,
-        token: data[0]?.token,
-        ip: data[0]?.ip,
-        appversion: data[0]?.appversion,
-        deviceid: data[0]?.deviceid,
+        token: hash,
+        ip: data[0]?.ip, // Todo: handle IP
+        appversion: '1.0',
+        deviceid: getDeviceId(),
         type: data[0]?.type,
         pincode: pin,
         mobile: data[0]?.mobile,
       };
 
-      // console.log(JSON.stringify({params}, null, 4));
+      PrettyPrintJSON({params});
 
       const requestOptions = {
         method: 'POST',
@@ -129,8 +136,10 @@ class Login extends Component {
           if (responseData.response === 1) {
             this.validation();
 
-            const token = responseData.data[0]?.token;
+            const token = responseData.data.token;
             const data = responseData.data;
+
+            console.log({token});
 
             this.props.setLogin(data);
 

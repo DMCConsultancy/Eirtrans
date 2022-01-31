@@ -7,10 +7,9 @@ export const setJobStatusCompleted = payload => {
   };
 };
 
-export const setJobStatusLoadCompleted = payload => {
+export const setJobStatusLoadCompleted = () => {
   return {
     type: type.JOB_LOAD_COMPLETED,
-    payload,
   };
 };
 

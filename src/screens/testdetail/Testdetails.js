@@ -190,11 +190,7 @@ class Loads extends Component {
 
         PrettyPrintJSON({handleLoadCollectedPressData: data});
 
-        setLoadCompleted({
-          job_id: loadItem.job_id,
-          load_id: loadItem.id,
-          status: 2,
-        });
+        setLoadCompleted();
 
         this.setModalVisible(!this.state.modalVisible_alert);
       } else {
@@ -233,7 +229,24 @@ class Loads extends Component {
     const {tableData} = this.state;
     const {jobStatus} = this.props;
 
-    return tableData.length === jobStatus.length;
+    let loadCollected = false;
+
+    if (jobStatus) {
+      loadCollected = jobStatus.every(job => {
+        // console.log({status: job.status});
+        return job.status >= 1;
+      });
+    }
+
+    PrettyPrintJSON({
+      condition: tableData.length === jobStatus.length && !loadCollected,
+      condition1: tableData.length === jobStatus.length,
+      condition2: loadCollected,
+      table: tableData.length,
+      jobStatus,
+    });
+
+    return tableData.length === jobStatus.length && !loadCollected;
   };
 
   render() {
@@ -277,7 +290,7 @@ class Loads extends Component {
                   {rowData.map((cellData, cellIndex) => {
                     if (cellData && typeof cellData === 'object') {
                       console.log({cellData});
-                      if (cellData.bookingStatus === '7') {
+                      if (cellData.bookingStatus === '7' || cellData.bookingStatus === '4') {
                         return (
                           <Icon
                             style={styles.checkMark}
@@ -369,7 +382,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setLoadCompleted: payload => dispatch(setJobStatusLoadCompleted(payload)),
+  setLoadCompleted: () => dispatch(setJobStatusLoadCompleted()),
 });
 
 export default connect(

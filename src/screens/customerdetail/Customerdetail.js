@@ -59,21 +59,35 @@ class Customerdetail extends Component {
   }
 
   setSign = result => {
+    const completeJobParamsFromDescription = this.props.navigation.getParam(
+      'completeJobParams',
+      null,
+    );
+
+    const {job_id, load_id} = completeJobParamsFromDescription;
+
+    const dirs = RNFetchBlob.fs.dirs;
+    const fileName = `${job_id}_${load_id}_collected_signature.png`;
+    var path = dirs.DocumentDir + `/${fileName}`;
+
     RNFetchBlob.fs
-      .writeFile(result.pathName, result.encoded, 'encoding type')
-      .then(success => {
-        console.log({success});
-        Alert.alert('info', `It's been downloaded in ${result.pathName}.`);
+      .writeFile(path, result.encoded, 'base64')
+      .then(res => {
+        console.log({res});
+        Alert.alert('info', `It's been downloaded in ${path}.`);
       })
       .catch(err => {
         console.warn(err);
       });
 
-    PrettyPrintJSON({result});
+    PrettyPrintJSON({path});
 
-    this.setState({result: result.encoded}, () => {
-      console.log({sign: result});
-    });
+    this.setState(
+      {result: {uri: 'file://' + path, name: fileName, type: 'image/png'}},
+      () => {
+        console.log({sign: result});
+      },
+    );
   };
   _onDragEvent() {
     // This callback will be called when the user enters signature
