@@ -12,17 +12,22 @@ import {
   Linking,
 } from 'react-native';
 import {Container, Left, Right, Textarea} from 'native-base';
-import styles from './Styles';
-import {colors, images} from '../../global/globalStyle';
 import Dot from 'react-native-vector-icons/Entypo';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
+import {connect} from 'react-redux';
 
-import {URL} from '../../../config.json';
+import styles from './Styles';
+import {colors, images} from '../../global/globalStyle';
+
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+
+import UserLocation from '../../services/userLocation';
+
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
-import {connect} from 'react-redux';
+
+import {URL} from '../../../config.json';
 
 class Truckdetail extends Component {
   constructor(props) {
@@ -33,7 +38,7 @@ class Truckdetail extends Component {
       to: '',
       btnclr: false,
       messege: '',
-      loading: true,
+      loading: false,
       info: null,
       data: [],
     };
@@ -75,8 +80,25 @@ class Truckdetail extends Component {
   }
 
   componentDidMount() {
-    this.getCustomerDetails();
+    // this.getCustomerDetails();
+    // this.getUsersCurrentLocation();
   }
+
+  getUsersCurrentLocation = async () => {
+    const location = new UserLocation();
+
+    this.setState({loading: true});
+
+    await location
+      .getUsersCurrentLocation()
+      .catch(error => console.log({location: error}));
+
+    console.log('INFO: location fetched...');
+
+    // Todo : set location address returned from getUsersCurrentLocation
+
+    this.setState({loading: false});
+  };
 
   UNSAFE_componentWillMount() {
     const info = this.props.navigation.getParam('info', info);
@@ -84,6 +106,8 @@ class Truckdetail extends Component {
   }
 
   handleCollectYes = () => {
+    const {from} = this.state;
+
     const loadItem = this.props.navigation.getParam('loadItem', null);
     const info = this.props.navigation.getParam('info', null);
 
@@ -91,6 +115,12 @@ class Truckdetail extends Component {
 
     if (!loadItem) {
       console.error('loadItem is null in TruckDetails');
+      return;
+    }
+
+    if (!from) {
+      alert('Please add Shipping from location, before collecting the job');
+      this.setModalVisible(!this.state.modalVisible_alert);
       return;
     }
 
@@ -103,6 +133,7 @@ class Truckdetail extends Component {
     };
 
     this.setModalVisible(!this.state.modalVisible_alert);
+    // this.setState({btnclr: true});
     this.props.navigation.navigate('Cars', {crashReportParams});
   };
 
@@ -366,7 +397,6 @@ class Truckdetail extends Component {
                       }
                       onPress={() => {
                         if (!jobCollected) {
-                          this.setState({btnclr: true});
                           this.setModalVisible(!this.state.modalVisible_alert);
                         }
                       }}>
