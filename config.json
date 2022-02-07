@@ -1,5 +1,5 @@
 {
-  "URL": "https://sub.eirtransapp.com/api/",
-  "UPLOADS": "https://sub.eirtransapp.com/uploads/",
+  "URL": "http://subnew.eirtransapp.com/api/",
+  "UPLOADS": "http://subnew.eirtransapp.com/uploads/",
   "GEOCODING_API": "AIzaSyBbLqG9fu5k8IT5rZofg0Z0B2Jgyrz_L6Y"
 }
