@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
   Linking,
+  Alert,
 } from 'react-native';
 import {Container, Left, Right, Textarea} from 'native-base';
 import Dot from 'react-native-vector-icons/Entypo';
@@ -129,7 +130,7 @@ class Truckdetail extends Component {
       load_id: loadItem.id,
       user_id: info.user_id,
       car_collection_id: loadItem.job_id,
-      job_id: loadItem.job_id,
+      job_id: info.id,
     };
 
     this.setModalVisible(!this.state.modalVisible_alert);
@@ -141,16 +142,17 @@ class Truckdetail extends Component {
     const {jobStatus, navigation} = this.props;
 
     const loadItem = navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
 
     let found = false;
 
-    console.log({jobStatus});
+    // console.log({jobStatus});
 
     if (jobStatus) {
       // console.log({job_id: loadItem.job_id, load_id: loadItem.id});
 
       found = jobStatus.some(
-        jobs => jobs.job_id === loadItem.job_id && jobs.load_id === loadItem.id,
+        jobs => jobs.job_id === info.id && jobs.load_id === loadItem.id,
       );
     }
 
@@ -161,19 +163,44 @@ class Truckdetail extends Component {
     const {jobStatus, navigation} = this.props;
 
     const loadItem = navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
 
     let found = false;
 
-    console.log({jobStatus});
+    console.log({getIfCurrentJobIsLoadCollected: jobStatus});
 
     if (jobStatus) {
       // console.log({job_id: loadItem.job_id, load_id: loadItem.id});
 
       found = jobStatus.some(
         jobs =>
-          jobs.job_id === loadItem.job_id &&
+          jobs.job_id === info.id &&
           jobs.load_id === loadItem.id &&
           jobs.status >= 1,
+      );
+    }
+
+    return found;
+  };
+
+  getIfCurrentJobFoundShipping = () => {
+    const {jobStatus, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
+
+    let found = false;
+
+    console.log({getIfCurrentJobFoundShipping: jobStatus});
+
+    if (jobStatus) {
+      // console.log({job_id: loadItem.job_id, load_id: loadItem.id});
+
+      found = jobStatus.some(
+        jobs =>
+          jobs.job_id === info.id &&
+          jobs.load_id === loadItem.id &&
+          jobs.status >= 1.5,
       );
     }
 
@@ -184,6 +211,7 @@ class Truckdetail extends Component {
     const {jobStatus, navigation} = this.props;
 
     const loadItem = navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
 
     let found = false;
 
@@ -192,7 +220,7 @@ class Truckdetail extends Component {
     if (jobStatus) {
       found = jobStatus.some(
         jobs =>
-          jobs.job_id === loadItem.job_id &&
+          jobs.job_id === info.id &&
           jobs.load_id === loadItem.id &&
           jobs.status >= 2,
       );
@@ -215,7 +243,7 @@ class Truckdetail extends Component {
     const crashDeliveredDetailsParams = {
       load_id: loadItem.id,
       user_id: info.user_id,
-      job_id: loadItem.job_id,
+      job_id: info.id,
     };
 
     this.props.navigation.navigate('DeliveredDetails', {
@@ -227,6 +255,7 @@ class Truckdetail extends Component {
     const state = this.state;
 
     const jobLoadCollected = this.getIfCurrentJobIsLoadCollected();
+    const jobFoundShipping = this.getIfCurrentJobFoundShipping();
     const jobCollected = this.getIfCurrentJobCollected();
     const jobDelivered = this.getIfCurrentJobIsDelivered();
 
@@ -341,7 +370,7 @@ class Truckdetail extends Component {
                     </View>
                     <View style={styles.card60}>
                       <Text style={styles.label}>
-                        {state.data[0]?.collectionaddress}
+                        {state.info?.collection_address}
                       </Text>
                     </View>
                   </View>
@@ -413,8 +442,14 @@ class Truckdetail extends Component {
                             : styles.btnsty
                         }
                         onPress={() => {
-                          if (!jobDelivered) {
+                          if (!jobDelivered && jobFoundShipping) {
                             this.handleDelivered();
+                          }
+
+                          if (!jobFoundShipping) {
+                            alert(
+                              'Job cannot be delivered until Shipping address is available, Please ring office to get your shipping address',
+                            );
                           }
                         }}>
                         <Text style={styles.text}>Delivered</Text>

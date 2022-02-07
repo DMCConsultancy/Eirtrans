@@ -24,7 +24,11 @@ import {setJobStatusCompleted} from '../../redux/action/jobStatus';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
-import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
+import {
+  getCurrentDate,
+  PrettyPrintJSON,
+  randomHash,
+} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
 
 import {URL} from '../../../config.json';
@@ -67,7 +71,9 @@ class Customerdetail extends Component {
     const {job_id, load_id} = completeJobParamsFromDescription;
 
     const dirs = RNFetchBlob.fs.dirs;
-    const fileName = `${job_id}_${load_id}_collected_signature.png`;
+    const fileName = `${randomHash(
+      8,
+    )}_${job_id}_${load_id}_collected_signature.png`;
     var path = dirs.DocumentDir + `/${fileName}`;
 
     RNFetchBlob.fs
@@ -322,12 +328,16 @@ class Customerdetail extends Component {
                   </View>
                 </TouchableOpacity>
               </View>
-
-              {/* <View>
-                              <Image source={{uri:this.state.result}} tintColor={"#000"}
-                               style={{height:100,width:"100%", resizeMode:"contain"}} />
-                              </View> */}
-
+              {this.state.result ? (
+                <View style={styles.mt20}>
+                  <Image
+                    source={this.state.result}
+                    style={{width: '100%', height: 200, resizeMode: 'contain'}}
+                  />
+                </View>
+              ) : (
+                <View />
+              )}
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity
                   onPress={() => this.handleCollected()}

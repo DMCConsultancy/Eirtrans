@@ -208,8 +208,15 @@ class Job extends Component {
 
   renderItem = ({item}) => {
     const collectedStatus = this.checkIfLoadIsCollected(item);
+    const loadDelivered = this.checkIfLoadIsDelivered(item);
 
-    console.log({collectedStatus});
+    console.log({collectedStatus, loadDelivered});
+
+    PrettyPrintJSON({item});
+
+    if (loadDelivered) {
+      return <View />;
+    }
 
     if (collectedStatus >= 2) {
       return (
@@ -253,6 +260,7 @@ class Job extends Component {
 
   checkIfLoadIsCollected = item => {
     const {jobStatus} = this.props;
+    const {showScreenshotLinks} = this.state;
 
     console.log('checking If Load Is Collected...');
 
@@ -272,13 +280,38 @@ class Job extends Component {
     }
 
     // if load collected by truck Pic is not updated show `Take Truck` link
-    if (found && found.status >= 2 && !truckPicUpdated) {
+    if (
+      found &&
+      found.status >= 2 &&
+      !truckPicUpdated &&
+      !showScreenshotLinks
+    ) {
       this.setState({showScreenshotLinks: true});
     }
 
     PrettyPrintJSON({getCollectedStatus: found});
 
     return found ? found.status : 0;
+  };
+
+  checkIfLoadIsDelivered = item => {
+    const {jobStatus} = this.props;
+
+    console.log('checking If Load Is delivered...');
+
+    let found = false;
+
+    // console.log({jobStatus});
+
+    if (jobStatus) {
+      found = jobStatus.find(
+        jobs => jobs.load_id === item.id && jobs.status === 6,
+      );
+
+      // console.log({found});
+    }
+
+    return found;
   };
 
   setModalVisible = visible => {
@@ -319,8 +352,9 @@ class Job extends Component {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
       if (responseData.response == 1) {
-        const data = responseData.data.map(loadObj => loadObj.loads[0]);
-        PrettyPrintJSON({jobs: data});
+        let data = responseData.data.map(loadObj => loadObj.loads[0]);
+        data = data.filter(loadObj => loadObj);
+        PrettyPrintJSON({jobssss: data});
 
         this.setState({data, loading: false});
       } else {
@@ -468,6 +502,7 @@ class Job extends Component {
                 extraData={refresh}
                 data={this.state.data}
                 renderItem={this.renderItem}
+                keyExtractor={item => item.id.toString()}
               />
             </View>
             {showScreenshotLinks && <RenderScreenshotLinks />}

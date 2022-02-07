@@ -8,6 +8,7 @@ import createMorningReducer from './createmorningaccepted';
 import SelectedTruckDetailReducer from './selectedtruckdetail';
 import getMorningReducer from './setmorningdata';
 import jobStatus from './jobStatus';
+import signature from './signature';
 
 export default combineReducers({
   allDriver: allDriverReducer,
@@ -19,4 +20,5 @@ export default combineReducers({
   SelectedTruckDetail: SelectedTruckDetailReducer,
   getMorning: getMorningReducer,
   jobStatus,
+  signature,
 });

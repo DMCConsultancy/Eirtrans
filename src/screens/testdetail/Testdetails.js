@@ -6,6 +6,7 @@ import {
   Image,
   Modal,
   ImageBackground,
+  ScrollView,
 } from 'react-native';
 import {Body, Container, Left, Right} from 'native-base';
 import styles from './Styles';
@@ -25,12 +26,21 @@ import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
-import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
+import {
+  getCurrentDate,
+  getCurrentLoadsJobsStatus,
+  getShippingAddressHeading,
+  PrettyPrintJSON,
+} from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
 import {connect} from 'react-redux';
 import {style} from 'styled-system';
 import {withNavigationFocus} from 'react-navigation';
-import {setJobStatusLoadCompleted} from '../../redux/action/jobStatus';
+import {
+  setJobFoundShipping,
+  setJobStatusLoadCompleted,
+  setJobStatusLoadDelivered,
+} from '../../redux/action/jobStatus';
 
 class Loads extends Component {
   constructor(props) {
@@ -47,6 +57,7 @@ class Loads extends Component {
         'lane',
       ],
       tableData: [],
+      shippingAddress: null,
       loading: true,
     };
   }
@@ -91,11 +102,13 @@ class Loads extends Component {
       if (responseData.response == 1) {
         const data = responseData.data;
 
-        this.setState({data, loading: false});
+        this.setState({data});
 
         PrettyPrintJSON({loads: data});
 
-        data.car_collection_data[0].map(ele => {
+        data.car_collection_data.map(arr => {
+          const ele = arr[0];
+
           var joined = this.state.tableData.concat([
             [
               ele.name,
@@ -110,6 +123,8 @@ class Loads extends Component {
           ]);
 
           this.setState({tableData: joined});
+
+          this.getCarShippingAddress();
         });
       } else {
         this.setState({loading: false});
@@ -139,7 +154,7 @@ class Loads extends Component {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
 
-      PrettyPrintJSON({checkStatus: responseData});
+      // PrettyPrintJSON({checkStatus: responseData});
 
       if (responseData.response == 1) {
         const data = responseData.data;
@@ -152,6 +167,68 @@ class Loads extends Component {
       console.log(error);
     }
   }
+
+  getCarShippingAddress = async (load = false) => {
+    let url = URL + 'getCarDeliverAddress';
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+    const driver_id = this.props.driverDetails.id;
+
+    const {setShippingFound} = this.props;
+
+    console.log('INFO: getting delivery address ');
+
+    if (load) {
+      this.setState({
+        loading: load,
+      });
+    }
+
+    if (!loadItem) {
+      console.log('WARN: load id not found');
+    }
+
+    const params = {
+      loadcontener_id: loadItem.id,
+      driver_id,
+    };
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    };
+
+    try {
+      let apiCall = await fetch(url, requestOptions);
+      let responseData = await apiCall.json();
+      if (responseData.response == 1) {
+        const data =
+          responseData.data &&
+          Array.isArray(responseData.data) &&
+          responseData.data.length
+            ? responseData.data[0]
+            : null;
+
+        PrettyPrintJSON({shippingAddress: data});
+
+        this.setState({shippingAddress: data, loading: false});
+
+        // if shipping is not already received, set receive code
+        if (!this.checkIfShippingCodeAlreadySet()) {
+          setShippingFound(loadItem.id);
+        }
+      } else {
+        this.setState({loading: false});
+        console.log(responseData.message);
+      }
+    } catch (error) {
+      this.setState({loading: false});
+      console.log(error);
+    }
+  };
 
   handleLoadCollectedPress = async () => {
     let url = URL + 'loadcomplete';
@@ -190,7 +267,7 @@ class Loads extends Component {
 
         PrettyPrintJSON({handleLoadCollectedPressData: data});
 
-        setLoadCompleted();
+        setLoadCompleted(loadItem.id);
 
         this.setModalVisible(!this.state.modalVisible_alert);
       } else {
@@ -201,9 +278,81 @@ class Loads extends Component {
     }
   };
 
+  handleDeliverAllJobs = () => {
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    this.props.navigation.navigate('DeliveredDetails', {
+      type: 'allDeliver',
+      loadID: loadItem.id,
+      jobID: loadItem.job_id,
+    });
+  };
+
+  handleSignature = () => {
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    this.props.navigation.navigate('DeliveredDetails', {
+      type: 'signature',
+      loadID: loadItem.id,
+      jobID: loadItem.job_id,
+    });
+  };
+
+  handleLoadDelivered = async () => {
+    let url = URL + 'finalSubmit';
+
+    const {setLoadDelivered} = this.props;
+
+    this.setState({loading: true});
+
+    const driver_id = this.props.driverDetails.id;
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+
+    var apiData = new FormData();
+
+    apiData.append('loadcontener_id', loadItem.id);
+    apiData.append('driver_id', driver_id);
+    apiData.append('date_time', getCurrentDate(true));
+    apiData.append('load_type', '');
+
+    PrettyPrintJSON({apiData});
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    try {
+      let apiCall = await fetch(url, requestOptions);
+      let responseData = await apiCall.json();
+
+      PrettyPrintJSON({handleLoadDeliveredPress: responseData});
+
+      this.setState({loading: false});
+
+      if (responseData.response == 1) {
+        const data = responseData.data;
+
+        PrettyPrintJSON({handleLoadDeliveredPressData: data});
+
+        setLoadDelivered(loadItem.id);
+
+        this.setModalVisible(!this.state.modalVisible_alert);
+
+        setTimeout(() => {
+          this.props.navigation.navigate('Job');
+        }, 3000);
+      } else {
+        console.log(responseData.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   componentDidMount() {
     this.getSelectedByJobCustomer();
-    // this.getDriverAssignToLoadertocompletejob();
+    // this.getCarShippingAddress();
   }
 
   componentDidUpdate(prevProps) {
@@ -226,31 +375,228 @@ class Loads extends Component {
   }
 
   showLoadCollected = () => {
-    const {tableData} = this.state;
+    const {tableData, data} = this.state;
     const {jobStatus} = this.props;
+
+    if (!data) {
+      return false;
+    }
+
+    const loadItem = this.props.navigation.getParam('loadItem', null);
 
     let loadCollected = false;
 
-    if (jobStatus) {
-      loadCollected = jobStatus.every(job => {
-        // console.log({status: job.status});
+    let currentLoadsJobs = getCurrentLoadsJobsStatus(
+      data?.car_collection_data,
+      jobStatus,
+      loadItem.id,
+    );
+
+    PrettyPrintJSON({currentLoadsJobs});
+
+    if (currentLoadsJobs.length) {
+      loadCollected = currentLoadsJobs.every(job => {
+        console.log({status: job.status});
         return job.status >= 1;
       });
     }
 
     PrettyPrintJSON({
-      condition: tableData.length === jobStatus.length && !loadCollected,
-      condition1: tableData.length === jobStatus.length,
+      currentLoadsJobs_length: currentLoadsJobs.length,
+      condition: tableData.length === currentLoadsJobs.length && !loadCollected,
+      condition1: tableData.length === currentLoadsJobs.length,
       condition2: loadCollected,
       table: tableData.length,
-      jobStatus,
     });
 
-    return tableData.length === jobStatus.length && !loadCollected;
+    return currentLoadsJobs.length === tableData.length && !loadCollected;
+  };
+
+  checkIfShippingCodeAlreadySet = () => {
+    const {jobStatus, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    let found = false;
+
+    if (jobStatus) {
+      found = jobStatus.some(
+        jobs => jobs.load_id === loadItem.id && jobs.status >= 1.5,
+      );
+    }
+
+    return found;
+  };
+
+  getLoadStatus = () => {
+    const {jobStatus, navigation} = this.props;
+    const {data} = this.state;
+
+    if (!data) {
+      return 0;
+    }
+
+    PrettyPrintJSON({jobStatussss: jobStatus});
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    let currentLoadsJobs = getCurrentLoadsJobsStatus(
+      data?.car_collection_data,
+      jobStatus,
+      loadItem.id,
+    );
+
+    let found = false;
+
+    if (currentLoadsJobs) {
+      found = currentLoadsJobs.find(jobs => jobs.load_id === loadItem.id);
+    }
+
+    PrettyPrintJSON({currentLoadsJobs, found});
+
+    return found ? found.status : 0;
+  };
+
+  renderShippingAddress = () => {
+    const {shippingAddress} = this.state;
+
+    PrettyPrintJSON(shippingAddress);
+
+    if (!shippingAddress) {
+      return <View />;
+    }
+
+    const shippingHeadings = [
+      'Shipping Ref',
+      'Customer Ref',
+      'PBN',
+      'Carrier',
+      'Route',
+      'Registration',
+      'Date of travel',
+      'Day',
+      'Time',
+      'Length',
+      'Driver',
+      'Contents',
+      'Customer',
+      'MRN',
+      'IMO',
+      'ETA',
+    ];
+
+    const shippingValues = {
+      shippingref: shippingAddress.shippingref,
+      customerref: shippingAddress.cusref,
+      pbn_number: shippingAddress.pbn_number,
+      carrier: shippingAddress.carrier,
+      route: shippingAddress.route,
+      registration: shippingAddress.registration,
+      dateoftravel: shippingAddress.dateoftravel,
+      day: shippingAddress.day,
+      time: shippingAddress.time,
+      length: shippingAddress.lenght,
+      drivername: shippingAddress.drivername,
+      contents: shippingAddress.contents,
+      customer: shippingAddress.customer,
+      mrn_number: shippingAddress.mrn_number,
+      imo: shippingAddress.imo,
+      eta: shippingAddress.eta,
+    };
+
+    return (
+      <View style={styles.shippingCont}>
+        <View style={styles.shippingHead}>
+          <Text style={styles.shippingTitle}>Shipping Address</Text>
+        </View>
+        <View style={styles.flexRow}>
+          <View style={styles.shippingHeadingsCont}>
+            {shippingHeadings.map(headings => (
+              <Text style={styles.shippingHeading}>{headings}</Text>
+            ))}
+          </View>
+          <View>
+            {shippingHeadings.map(() => (
+              <Text style={styles.shippingHeading}> : </Text>
+            ))}
+          </View>
+          <View style={styles.shippingValuesCont}>
+            {Object.keys(shippingValues).map(keys => (
+              <Text style={styles.shippingHeading}>{shippingValues[keys]}</Text>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  renderLoadActionbuttons = () => {
+    const {shippingAddress} = this.state;
+
+    if (!shippingAddress) {
+      return <View />;
+    }
+
+    const loadStatus = this.getLoadStatus();
+
+    console.log({loadStatus});
+
+    const onPress =
+      loadStatus < 4
+        ? this.handleDeliverAllJobs
+        : loadStatus === 4
+        ? this.handleSignature
+        : this.handleLoadDelivered;
+
+    const title =
+      loadStatus < 4
+        ? 'Deliver All Jobs'
+        : loadStatus === 4
+        ? 'Signature'
+        : 'Load Delivered';
+
+    return (
+      <View>
+        <ActionButton title={title} onPress={onPress} />
+      </View>
+    );
+  };
+
+  renderSignature = () => {
+    const {signature, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+
+    const loadSignature = signature.find(sign => sign.load_id === loadItem.id);
+
+    console.log({loadSignature});
+
+    if (!loadSignature) {
+      return <View />;
+    }
+
+    return (
+      <View style={styles.signCont}>
+        <View>
+          <Text style={styles.text}>{loadSignature.name}</Text>
+        </View>
+        <View>
+          <Image
+            source={loadSignature.image}
+            style={{width: 200, height: 200, resizeMode: 'contain'}}
+          />
+        </View>
+      </View>
+    );
   };
 
   render() {
     const state = this.state;
+
+    const RenderShippingAddress = this.renderShippingAddress;
+    const RenderLoadActionbuttons = this.renderLoadActionbuttons;
+
+    const RenderSignature = this.renderSignature;
 
     return (
       <Container style={styles.container}>
@@ -278,70 +624,94 @@ class Loads extends Component {
             </Right>
           </Header>
 
-          <View style={styles.content}>
+          <ScrollView contentContainerStyle={styles.content}>
             <Table borderStyle={styles.borderStyle}>
               <Row
                 data={state.tableHead}
                 style={styles.head}
                 textStyle={styles.text}
               />
-              {state.tableData.map((rowData, index) => (
-                <TableWrapper key={index} style={styles.row}>
-                  {rowData.map((cellData, cellIndex) => {
-                    if (cellData && typeof cellData === 'object') {
-                      console.log({cellData});
-                      if (cellData.bookingStatus === '7' || cellData.bookingStatus === '4') {
-                        return (
-                          <Icon
-                            style={styles.checkMark}
-                            name="check"
-                            size={65}
-                            color={colors.success}
-                            key={cellIndex}
-                          />
-                        );
-                      } else {
-                        return (
-                          <Icon
-                            style={styles.checkMark}
-                            name="loading2"
-                            size={0}
-                            color={'transparent'}
-                            key={cellIndex}
-                          />
-                        );
+              {state.tableData.map((rowData, index) => {
+                const bookingDelivered =
+                  rowData[rowData.length - 1].bookingStatus === '4';
+
+                // console.log({bookingDelivered});
+
+                return (
+                  <TableWrapper key={index} style={styles.row}>
+                    {rowData.map((cellData, cellIndex) => {
+                      if (cellData && typeof cellData === 'object') {
+                        console.log({cellData});
+                        if (
+                          cellData.bookingStatus === '7' ||
+                          cellData.bookingStatus === '4'
+                        ) {
+                          return (
+                            <Icon
+                              style={styles.checkMark}
+                              name="check"
+                              size={65}
+                              color={colors.success}
+                              key={cellIndex}
+                            />
+                          );
+                        } else {
+                          return (
+                            <Icon
+                              style={styles.checkMark}
+                              name="loading2"
+                              size={0}
+                              color={'transparent'}
+                              key={cellIndex}
+                            />
+                          );
+                        }
                       }
-                    }
 
-                    console.log(`returning cell on index = ${cellIndex}`);
+                      console.log(
+                        `returning cell on index = ${cellIndex}, ${
+                          cellData.bookingStatus === '4'
+                        }, ${cellData.bookingStatus}`,
+                      );
 
-                    return (
-                      <Cell
-                        key={cellIndex}
-                        onPress={() => this.getCustomerID(index)}
-                        data={cellData}
-                        textStyle={styles.textCell}
-                      />
-                    );
-                  })}
-                </TableWrapper>
-              ))}
+                      return (
+                        <Cell
+                          key={cellIndex}
+                          onPress={() => this.getCustomerID(index)}
+                          data={cellData}
+                          textStyle={[
+                            styles.textCell,
+                            {
+                              color: bookingDelivered
+                                ? colors.success
+                                : colors.textDark,
+                            },
+                          ]}
+                        />
+                      );
+                    })}
+                  </TableWrapper>
+                );
+              })}
             </Table>
+            <RenderShippingAddress />
+            <RenderSignature />
+            <RenderLoadActionbuttons />
 
             {/* <FlatList style={styles.borderStyle}
-                         data={this.state.data?.car_collection_data}
-                        renderItem={this.renderItem}
-                        keyExtractor={item => item.id}
-                        ListHeaderComponent={this.FlatListHeader}
-                        ListEmptyComponent={this.EmptyListMessage}
-                    /> */}
+                data={this.state.data?.car_collection_data}
+                renderItem={this.renderItem}
+                keyExtractor={item => item.id}
+                ListHeaderComponent={this.FlatListHeader}
+                ListEmptyComponent={this.EmptyListMessage}
+            /> */}
             {this.showLoadCollected() && (
               <ActionButton
                 onPress={() => this.handleLoadCollectedPress()}
                 title={'Load Collected'}
               />
             )}
-          </View>
+          </ScrollView>
 
           {this.state.loading == true && <Loader />}
         </ImageBackground>
@@ -379,10 +749,13 @@ class Loads extends Component {
 const mapStateToProps = state => ({
   driverDetails: state.login.data,
   jobStatus: state.jobStatus,
+  signature: state.signature,
 });
 
 const mapDispatchToProps = dispatch => ({
-  setLoadCompleted: () => dispatch(setJobStatusLoadCompleted()),
+  setLoadCompleted: loadId => dispatch(setJobStatusLoadCompleted(loadId)),
+  setShippingFound: loadId => dispatch(setJobFoundShipping(loadId)),
+  setLoadDelivered: loadId => dispatch(setJobStatusLoadDelivered(loadId)),
 });
 
 export default connect(

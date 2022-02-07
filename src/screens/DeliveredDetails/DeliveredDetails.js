@@ -21,13 +21,19 @@ import Toast from 'react-native-simple-toast';
 import {connect} from 'react-redux';
 
 import {
-  setJobStatusCompleted,
+  setJobStatusAllDelivered,
   setJobStatusDelivered,
+  setJobStatusSignature,
 } from '../../redux/action/jobStatus';
+import {addLoadSignature} from '../../redux/action/signatureActions';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
-import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
+import {
+  getCurrentDate,
+  PrettyPrintJSON,
+  randomHash,
+} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
 
 import {URL} from '../../../config.json';
@@ -63,15 +69,14 @@ class DeliveredDetails extends Component {
   }
 
   setSign = result => {
-    const crashDeliveredDetailsParamsFromTruckDetails =
-      this.props.navigation.getParam('crashDeliveredDetailsParams', null);
-
-    const {job_id, load_id} = crashDeliveredDetailsParamsFromTruckDetails;
+    const {job_id, load_id} = this.getNavigationParams();
 
     // var Base64Code = result.encoded.split("data:image/png;base64,");
 
     const dirs = RNFetchBlob.fs.dirs;
-    const fileName = `${job_id}_${load_id}_delivery_signature.png`;
+    const fileName = `${randomHash(
+      8,
+    )}_${job_id}_${load_id}_delivery_signature.png`;
 
     var path = dirs.DocumentDir + `/${fileName}`;
 
@@ -164,7 +169,162 @@ class DeliveredDetails extends Component {
     }
   };
 
-  handleSubmit = async () => {
+  getNavigationParams = () => {
+    const apiType = this.props.navigation.getParam('type', null);
+    let load_id = '';
+    let job_id = '';
+
+    switch (apiType) {
+      case 'signature':
+        load_id = this.props.navigation.getParam('loadID', null);
+        job_id = this.props.navigation.getParam('jobID', null);
+
+        return {load_id, job_id};
+      case 'allDeliver':
+        load_id = this.props.navigation.getParam('loadID', null);
+        job_id = this.props.navigation.getParam('jobID', null);
+
+        return {load_id, job_id};
+      default:
+        return this.props.navigation.getParam(
+          'crashDeliveredDetailsParams',
+          null,
+        );
+    }
+  };
+
+  handleSubmit = () => {
+    const apiType = this.props.navigation.getParam('type', null);
+
+    switch (apiType) {
+      case 'signature':
+        this.callMultipleDeliverySignature();
+        return;
+      case 'allDeliver':
+        this.callAllDelivered();
+        return;
+      default:
+        this.callSigleDeliverySignature();
+        break;
+    }
+  };
+
+  callMultipleDeliverySignature = async () => {
+    const {load_id, job_id} = this.getNavigationParams();
+
+    const {setJobStatusToSignature, addLoadSignatureToStore} = this.props;
+
+    const {name, phone, result} = this.state;
+
+    this.setState({loading: true});
+
+    let url = URL + 'customer_delivery_signature';
+
+    const driver_id = this.props.login?.id;
+
+    var apiData = new FormData();
+
+    apiData.append('loadcontener_id', load_id);
+    apiData.append('driver_id', driver_id);
+    apiData.append('date_time', getCurrentDate(true));
+
+    apiData.append('name', name);
+    apiData.append('email', phone);
+    apiData.append('job_id', job_id);
+    apiData.append('shipping_type', 2);
+    apiData.append('cus_signature', result);
+
+    PrettyPrintJSON({apiData});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    PrettyPrintJSON({requestOptions});
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.json();
+
+    PrettyPrintJSON({responseData});
+
+    this.setState({loading: false});
+
+    if (responseData.response === 1) {
+      console.log({callAllDelivered: responseData.message});
+
+      this.setModalVisible1(!this.state.modalVisible_alert1);
+
+      setJobStatusToSignature(load_id);
+      addLoadSignatureToStore({
+        load_id,
+        image: result,
+        name: name,
+      });
+    } else {
+      console.log('customer_delivery_signature_error', responseData.message);
+
+      Toast.show(responseData.message);
+    }
+  };
+
+  callAllDelivered = async () => {
+    const {load_id} = this.getNavigationParams();
+
+    const {setJobStatusAllDelivered} = this.props;
+
+    const {name, phone, notes} = this.state;
+
+    this.setState({loading: true});
+
+    let url = URL + 'allJobDelivery';
+
+    const driver_id = this.props.login?.id;
+
+    var apiData = new FormData();
+
+    apiData.append('loadcontener_id', load_id);
+    apiData.append('driver_id', driver_id);
+
+    apiData.append('name', name);
+    apiData.append('email', phone);
+    apiData.append('note', notes);
+    apiData.append('selecttool', '');
+    apiData.append('carkey', 0);
+    apiData.append('date_time', getCurrentDate(true));
+
+    PrettyPrintJSON({apiData});
+    // return;
+
+    const requestOptions = {
+      method: 'POST',
+      body: apiData,
+    };
+
+    PrettyPrintJSON({requestOptions});
+
+    let apiCall = await fetch(url, requestOptions);
+    let responseData = await apiCall.json();
+
+    PrettyPrintJSON({responseData});
+
+    this.setState({loading: false});
+
+    if (responseData.response === 1) {
+      console.log({callAllDelivered: responseData.message});
+
+      this.setModalVisible1(!this.state.modalVisible_alert1);
+
+      setJobStatusAllDelivered(load_id);
+    } else {
+      console.log('allJobDelivery_error', responseData.message);
+
+      Toast.show(responseData.message);
+    }
+  };
+
+  callSigleDeliverySignature = async () => {
     const {name, phone, result} = this.state;
 
     const {setJobDelivered} = this.props;
@@ -313,6 +473,17 @@ class DeliveredDetails extends Component {
                 </TouchableOpacity>
               </View>
 
+              {this.state.result ? (
+                <View style={styles.mt20}>
+                  <Image
+                    source={this.state.result}
+                    style={{width: '100%', height: 200, resizeMode: 'contain'}}
+                  />
+                </View>
+              ) : (
+                <View />
+              )}
+
               {/* <View>
                               <Image source={{uri:this.state.result}} tintColor={"#000"}
                                style={{height:100,width:"100%", resizeMode:"contain"}} />
@@ -423,6 +594,12 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setJobDelivered: payload => dispatch(setJobStatusDelivered(payload)),
+  setJobStatusAllDelivered: loadId =>
+    dispatch(setJobStatusAllDelivered(loadId)),
+  setJobStatusToSignature: loadId => dispatch(setJobStatusSignature(loadId)),
+
+  // signature update
+  addLoadSignatureToStore: payload => dispatch(addLoadSignature(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeliveredDetails);

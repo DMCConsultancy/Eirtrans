@@ -60,12 +60,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFF',
     position: 'relative',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   checkMark: {
     position: 'absolute',
     alignSelf: 'center',
-    
   },
   btn: {width: 58, backgroundColor: '#78B7BB', borderRadius: 2},
   btnText: {
@@ -122,6 +121,55 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,
+  },
+
+  // shipping
+
+  shippingCont: {
+    backgroundColor: '#fff',
+    width: '95%',
+    alignSelf: 'center',
+    padding: 10,
+    marginVertical: 30,
+    borderRadius: 5,
+  },
+
+  flexRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+
+  shippingHead: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+
+  shippingTitle: {
+    color: colors.textDark,
+    fontSize: size.title,
+    fontWeight: '800',
+    fontFamily: 'Roboto-Bold',
+  },
+
+  shippingHeadingsCont: {
+    // width: '30%',
+    // backgroundColor: 'blue'
+  },
+
+  shippingValuesCont: {
+    width: '50%',
+    // backgroundColor: 'red',
+  },
+
+  signCont: {
+    backgroundColor: '#fff',
+    padding: 10,
+    width: '95%',
+    borderRadius: 3,
+    alignItems: 'center',
+    alignSelf: 'center',
   },
 });
 

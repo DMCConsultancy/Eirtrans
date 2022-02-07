@@ -1,8 +1,6 @@
 import cloneDeep from 'lodash.clonedeep';
 import {type} from '../types';
 
-cloneDeep;
-
 /**
  * jobStatus will track status of jobs as the job collection progress jobStatus
  * is changed to some partuclar status explain below:
@@ -21,10 +19,17 @@ cloneDeep;
  *
  * 1 => load collected
  *
+ * 1.5 => shipping address
+ *
  * 2 => delivered
  *
  * 3 => screenshot sent
  *
+ * 4 => all delivered
+ *
+ * 5 => signature
+ *
+ * 6 => load delivered
  */
 
 const INITIAL_STATE = [];
@@ -39,6 +44,27 @@ const jobStaus = (state = INITIAL_STATE, action) => {
       return clonedState_JOB_COMPLETED;
 
     // ==============================
+
+    case type.JOB_FOUND_SHIPPING_ADDRESS:
+      const clonedState_JOB_FOUND_SHIPPING_ADDRESS = cloneDeep(state);
+
+      const updatedState_JOB_FOUND_SHIPPING_ADDRESS =
+        clonedState_JOB_FOUND_SHIPPING_ADDRESS.map(ele => {
+          const clonedEle = {...ele};
+
+          // console.log({inReducer: action.loadId});
+
+          // complete loads of only current load
+          if (clonedEle.load_id === action.loadId) {
+            clonedEle.status = 1.5;
+          }
+
+          return clonedEle;
+        });
+
+      return updatedState_JOB_FOUND_SHIPPING_ADDRESS;
+
+    // ===================================
 
     case type.JOB_DELIVERED:
       const clonedState_JOB_DELIVERED = cloneDeep(state);
@@ -68,12 +94,82 @@ const jobStaus = (state = INITIAL_STATE, action) => {
         clonedState_JOB_LOAD_COMPLETED.map(ele => {
           const clonedEle = {...ele};
 
-          clonedEle.status = 1;
+          console.log({inReducer: action.loadId});
+
+          // complete loads of only current load
+          if (clonedEle.load_id === action.loadId) {
+            clonedEle.status = 1;
+          }
 
           return clonedEle;
         });
 
       return updatedState_JOB_LOAD_COMPLETED;
+
+    // ==============================
+
+    case type.JOB_ALL_DELIVERED:
+      const clonedState_JOB_ALL_DELIVERED = cloneDeep(state);
+
+      const updatedState_JOB_ALL_DELIVERED = clonedState_JOB_ALL_DELIVERED.map(
+        ele => {
+          const clonedEle = {...ele};
+
+          // console.log({inReducer: action.loadId});
+
+          // complete loads of only current load
+          if (clonedEle.load_id === action.loadId) {
+            clonedEle.status = 4;
+          }
+
+          return clonedEle;
+        },
+      );
+
+      return updatedState_JOB_ALL_DELIVERED;
+
+    // ==============================
+
+    case type.JOB_SIGNATURE:
+      const clonedState_JOB_SIGNATURE = cloneDeep(state);
+
+      const updatedState_JOB_SIGNATURE = clonedState_JOB_SIGNATURE.map(ele => {
+        const clonedEle = {...ele};
+
+        // console.log({inReducer: action.loadId});
+
+        // complete loads of only current load
+        if (clonedEle.load_id === action.loadId) {
+          clonedEle.status = 5;
+        }
+
+        return clonedEle;
+      });
+
+      return updatedState_JOB_SIGNATURE;
+
+    // ============================
+
+    case type.JOB_LOAD_DELIVERED:
+      const clonedState_JOB_LOAD_DELIVERED = cloneDeep(state);
+
+      const updatedState_JOB_LOAD_DELIVERED =
+        clonedState_JOB_LOAD_DELIVERED.map(ele => {
+          const clonedEle = {...ele};
+
+          // console.log({inReducer: action.loadId});
+
+          // complete loads of only current load
+          if (clonedEle.load_id === action.loadId) {
+            clonedEle.status = 6;
+          }
+
+          return clonedEle;
+        });
+
+      return updatedState_JOB_LOAD_DELIVERED;
+
+    // ============================
 
     case type.JOB_FINAL_TRUCK_SCREENSHOT:
       const clonedState_JOB_FINAL_TRUCK_SCREENSHOT = cloneDeep(state);
