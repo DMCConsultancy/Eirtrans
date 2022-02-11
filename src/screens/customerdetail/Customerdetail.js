@@ -137,7 +137,7 @@ class Customerdetail extends Component {
       user_id: completeJobParamsFromDescription.user_id,
       jobstatus: '1',
       loadcontener_id: completeJobParamsFromDescription.load_id,
-      lan_status: '1',
+      lan_status: '',
       signature: result,
     };
 
