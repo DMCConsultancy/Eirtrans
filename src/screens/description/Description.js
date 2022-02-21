@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   ImageBackground,
@@ -24,6 +23,8 @@ import {colors, images, size, fontfamily} from '../../global/globalStyle';
 import styles from './Styles';
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
+
+import Text from '../../components/Text';
 export default class Truckdetail extends Component {
   constructor(props) {
     super(props);
@@ -173,7 +174,10 @@ export default class Truckdetail extends Component {
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           <Header>
             <Left>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>

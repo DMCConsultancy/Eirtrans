@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   Image,
@@ -29,6 +28,7 @@ import {colors, images} from '../../global/globalStyle';
 import styles from './Styles';
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
+import Text from '../../components/Text';
 
 const numColumns = 3;
 

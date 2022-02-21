@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   TouchableOpacity,
   View,
   FlatList,
@@ -11,6 +10,7 @@ import {Container, Left, Right} from 'native-base';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {URL, UPLOADS} from '../../../config.json';
 

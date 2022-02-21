@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   Image,
@@ -23,25 +22,29 @@ import {colors, images} from '../../global/globalStyle';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import UserLocation from '../../services/userLocation';
 
-import {PrettyPrintJSON} from '../../utils/helperFunctions';
+import {isJSObj, PrettyPrintJSON} from '../../utils/helperFunctions';
 
 import {URL} from '../../../config.json';
+import NotCollectedFrom from './NotCollectedFrom';
 
 class Truckdetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modalVisible_alert: false,
-      from: '', // Todo: add user's current location
+      from: '',
       to: '',
       btnclr: false,
       messege: '',
       loading: false,
       info: null,
       data: [],
+      notCollected: false,
+      notCollectedObj: null,
     };
   }
 
@@ -82,23 +85,30 @@ class Truckdetail extends Component {
 
   componentDidMount() {
     // this.getCustomerDetails();
-    // this.getUsersCurrentLocation();
+    this.getUsersCurrentLocation();
+    this.setNotCollectedObj();
   }
+
+  componentDidUpdate = prevProps => {
+    if (prevProps.notCollected.length !== this.props.notCollected.length) {
+      this.setNotCollectedObj();
+    }
+  };
 
   getUsersCurrentLocation = async () => {
     const location = new UserLocation();
 
     this.setState({loading: true});
 
-    await location
+    const streetAddress = await location
       .getUsersCurrentLocation()
       .catch(error => console.log({location: error}));
 
     console.log('INFO: location fetched...');
 
-    // Todo : set location address returned from getUsersCurrentLocation
+    PrettyPrintJSON({streetAddress});
 
-    this.setState({loading: false});
+    this.setState({loading: false, from: streetAddress || ''});
   };
 
   UNSAFE_componentWillMount() {
@@ -115,7 +125,7 @@ class Truckdetail extends Component {
     PrettyPrintJSON({loadItem, info});
 
     if (!loadItem) {
-      console.error('loadItem is null in TruckDetails');
+      console.error('lo adItem is null in TruckDetails');
       return;
     }
 
@@ -189,6 +199,10 @@ class Truckdetail extends Component {
     const loadItem = navigation.getParam('loadItem', null);
     const info = this.props.navigation.getParam('info', null);
 
+    if (loadItem.shipping_type === '0') {
+      return true;
+    }
+
     let found = false;
 
     console.log({getIfCurrentJobFoundShipping: jobStatus});
@@ -229,6 +243,35 @@ class Truckdetail extends Component {
     return found;
   };
 
+  setNotCollectedObj = () => {
+    const {notCollected, navigation} = this.props;
+
+    const loadItem = navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
+
+    let found = false;
+
+    console.log({notCollected});
+
+    if (notCollected) {
+      found = notCollected.find(
+        jobs => jobs.job_id === info.id && jobs.load_id === loadItem.id,
+      );
+    }
+
+    console.log({found});
+
+    if (isJSObj(found)) {
+      this.setState({
+        notCollectedObj: {
+          name: found.name,
+          reason: found.reason,
+          img: found.imgUri,
+        },
+      });
+    }
+  };
+
   handleDelivered = () => {
     const loadItem = this.props.navigation.getParam('loadItem', null);
     const info = this.props.navigation.getParam('info', null);
@@ -244,6 +287,7 @@ class Truckdetail extends Component {
       load_id: loadItem.id,
       user_id: info.user_id,
       job_id: info.id,
+      shipping_type: loadItem.shipping_type,
     };
 
     this.props.navigation.navigate('DeliveredDetails', {
@@ -254,17 +298,37 @@ class Truckdetail extends Component {
   render() {
     const state = this.state;
 
+    const loadItem = this.props.navigation.getParam('loadItem', null);
+    const info = this.props.navigation.getParam('info', null);
+
+    const notCollectedParams = {
+      customer_id: loadItem.id,
+      load_id: loadItem.id,
+      user_id: info.user_id,
+      car_collection_id: loadItem.job_id,
+      job_id: info.id,
+    };
+
     const jobLoadCollected = this.getIfCurrentJobIsLoadCollected();
     const jobFoundShipping = this.getIfCurrentJobFoundShipping();
     const jobCollected = this.getIfCurrentJobCollected();
     const jobDelivered = this.getIfCurrentJobIsDelivered();
+    const jobNotCollected = state.notCollectedObj;
 
-    console.log({jobLoadCollected, jobDelivered, jobCollected});
+    console.log({
+      jobLoadCollected,
+      jobDelivered,
+      jobCollected,
+      jobNotCollected,
+    });
 
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           <Header>
             <Left>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
@@ -315,7 +379,7 @@ class Truckdetail extends Component {
                       editable={false}
                       selectTextOnFocus={false}
                       // onChangeText={(form)=>this.setState({form})}
-                      value={this.state.info?.collection_address}
+                      value={this.state.info?.delivery_address}
                     />
                   </View>
                 </View>
@@ -334,6 +398,8 @@ class Truckdetail extends Component {
                     ios: `${scheme}${label}`,
                     android: `${scheme}${label}`,
                   });
+
+                  PrettyPrintJSON({url});
 
                   Linking.openURL(url);
                 }}>
@@ -425,6 +491,12 @@ class Truckdetail extends Component {
                           : styles.btnsty
                       }
                       onPress={() => {
+                        if (jobNotCollected) {
+                          console.log(
+                            'INFO: job already not collected, so collected is disabled',
+                          );
+                          return;
+                        }
                         if (!jobCollected) {
                           this.setModalVisible(!this.state.modalVisible_alert);
                         }
@@ -433,7 +505,7 @@ class Truckdetail extends Component {
                     </TouchableOpacity>
                   </View>
 
-                  {jobLoadCollected ? (
+                  {jobLoadCollected && !jobNotCollected ? (
                     <View style={{width: '50%'}}>
                       <TouchableOpacity
                         style={
@@ -458,17 +530,34 @@ class Truckdetail extends Component {
                   ) : (
                     <View style={{width: '50%'}}>
                       <TouchableOpacity
-                        style={styles.btnsty}
+                        style={
+                          jobNotCollected
+                            ? [styles.btnsty, {backgroundColor: colors.success}]
+                            : styles.btnsty
+                        }
                         onPress={() => {
-                          console.log(
-                            'Warning: nothing happens on Not Collected',
-                          );
+                          if (jobNotCollected) {
+                            console.log('INFO: job already not collected');
+                            return;
+                          }
+                          this.setState({notCollected: true});
                         }}>
                         <Text style={styles.text}>Not Collected</Text>
                       </TouchableOpacity>
                     </View>
                   )}
                 </View>
+                {state.notCollected || jobNotCollected ? (
+                  <View>
+                    <NotCollectedFrom
+                      notCollectedParams={notCollectedParams}
+                      notCollectedObj={jobNotCollected}
+                      navigation={this.props.navigation}
+                    />
+                  </View>
+                ) : (
+                  <View />
+                )}
               </View>
             </View>
             {this.state.loading == true && <Loader />}
@@ -527,6 +616,7 @@ class Truckdetail extends Component {
 const mapStateToProps = state => ({
   driverDetails: state.login.data,
   jobStatus: state.jobStatus,
+  notCollected: state.notCollected,
 });
 
 const mapDispatchToProps = dispatch => ({});

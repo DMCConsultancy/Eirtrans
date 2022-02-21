@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   TextInput,
@@ -9,7 +8,6 @@ import {
   Platform,
   PermissionsAndroid,
   Appearance,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import {Container, Left, Right, Toast} from 'native-base';
@@ -25,6 +23,7 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {colors, images, size, fontfamily} from '../../global/globalStyle';
 

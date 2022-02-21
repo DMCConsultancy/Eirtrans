@@ -15,8 +15,10 @@ import {type} from '../types';
  *
  * codes :
  *
+ * -1 => not collected
+ * 
  * 0 => collected
- *
+ * 
  * 1 => load collected
  *
  * 1.5 => shipping address
@@ -42,6 +44,15 @@ const jobStaus = (state = INITIAL_STATE, action) => {
       clonedState_JOB_COMPLETED.push(action.payload);
 
       return clonedState_JOB_COMPLETED;
+
+    // ==============================
+
+    case type.JOB_NOT_COLLECTED:
+      const clonedState_JOB_NOT_COLLECTED = cloneDeep(state);
+
+      clonedState_JOB_NOT_COLLECTED.push(action.payload);
+
+      return clonedState_JOB_NOT_COLLECTED;
 
     // ==============================
 

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   formLabal: {
     fontSize: size.subtitle,
-    fontFamily: fontfamily.medium,
+    fontFamily: fontfamily.bold,
     color: '#000',
   },
   textinput: {

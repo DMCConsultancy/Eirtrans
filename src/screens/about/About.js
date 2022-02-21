@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {Container, Left, Right, Card} from 'native-base';
-import {Text, View, TouchableOpacity, Image, FlatList} from 'react-native';
+import {View, TouchableOpacity, Image, FlatList} from 'react-native';
 import styles from './Styles';
-import Icon from 'react-native-vector-icons/Feather';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {colors, images} from '../../global/globalStyle';
 export default class About extends Component {

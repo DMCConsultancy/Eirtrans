@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
-  StatusBar,
   Modal,
   ScrollView,
   TextInput,
@@ -29,6 +27,8 @@ import {addLoadSignature} from '../../redux/action/signatureActions';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
+
 import {
   getCurrentDate,
   PrettyPrintJSON,
@@ -334,7 +334,13 @@ class DeliveredDetails extends Component {
     const crashDeliveredDetailsParamsFromTruckDetails =
       this.props.navigation.getParam('crashDeliveredDetailsParams', null);
 
-    PrettyPrintJSON({crashDeliveredDetailsParamsFromTruckDetails});
+    const shipping_required =
+      crashDeliveredDetailsParamsFromTruckDetails.shipping_type === '1';
+
+    PrettyPrintJSON({
+      crashDeliveredDetailsParamsFromTruckDetails,
+      shipping_required,
+    });
 
     let url = URL + 'singlejob_delivery_signature';
 
@@ -388,6 +394,7 @@ class DeliveredDetails extends Component {
         job_id: crashDeliveredDetailsParamsFromTruckDetails.job_id,
         load_id: crashDeliveredDetailsParamsFromTruckDetails.load_id,
         status: 2,
+        // status: shipping_required ? 2 : 4,
       });
     } else {
       console.log('singlejob_delivery_signature_error', responseData.message);

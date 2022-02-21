@@ -54,3 +54,10 @@ export const setJobStatusFinalTruckScreenshot = () => {
     type: type.JOB_FINAL_TRUCK_SCREENSHOT,
   };
 };
+
+export const setJobStatusNotCollected = payload => {
+  return {
+    type: type.JOB_NOT_COLLECTED,
+    payload,
+  };
+};

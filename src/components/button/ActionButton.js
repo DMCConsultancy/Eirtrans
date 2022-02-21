@@ -1,12 +1,14 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
-import {colors, fontfamily, size} from '../../global/globalStyle';
+import {fontfamily, size} from '../../global/globalStyle';
 
-export const ActionButton = ({onPress, title}) => {
+import Text from '../Text';
+
+export const ActionButton = ({onPress, title, containerStyle, btnStyle}) => {
   return (
-    <View style={{alignItems: 'center'}}>
-      <TouchableOpacity onPress={onPress} style={styles.btnsty}>
+    <View style={[{alignItems: 'center'}, containerStyle]}>
+      <TouchableOpacity onPress={onPress} style={[styles.btnsty, btnStyle]}>
         <Text style={styles.btnText}>{title}</Text>
       </TouchableOpacity>
     </View>

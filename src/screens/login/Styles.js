@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingTop: 50,
+    alignSelf: 'center',
   },
   logo: {
     width: width * 0.8,
@@ -21,11 +22,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pickersty: {
+    // width: '100%',
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 4,
     marginTop: 40,
     height: 45,
+    // maxWidth: 576,
   },
   input: {
     backgroundColor: '#666',

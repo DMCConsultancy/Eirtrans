@@ -27,6 +27,7 @@ const type = {
 
   // job status =========
   JOB_COMPLETED: 'JOB_COMPLETED',
+  JOB_NOT_COLLECTED: 'JOB_NOT_COLLECTED',
   JOB_LOAD_COMPLETED: 'JOB_LOAD_COMPLETED',
   JOB_FOUND_SHIPPING_ADDRESS: 'JOB_FOUND_SHIPPING_ADDRESS',
   JOB_DELIVERED: 'JOB_DELIVERED',
@@ -38,6 +39,9 @@ const type = {
   // signature =========
   SIGNATURE_ADD: 'SIGNATURE_ADD',
   SIGNATURE_REMOVE: 'SIGNATURE_REMOVE',
+
+  // not collected ===========
+  NOT_COLLECTED_ADD_JOB: 'NOT_COLLECTED_ADD_JOB',
 };
 
 export {type};

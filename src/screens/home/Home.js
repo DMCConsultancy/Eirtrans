@@ -1,15 +1,12 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
-  Button,
   TouchableOpacity,
   Image,
   ImageBackground,
   Modal,
   ActivityIndicator,
   ScrollView,
-  Alert,
 } from 'react-native';
 import {Container} from 'native-base';
 import {DrawerActions} from 'react-navigation-drawer';
@@ -284,7 +281,10 @@ class Home extends Component {
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           <View style={styles.content}>
             <TouchableOpacity onPress={() => this.toggleDrawer()}>
               <Image source={images.menu} style={styles.menu} />
@@ -293,7 +293,7 @@ class Home extends Component {
             <View style={styles.center}>
               <Image style={styles.logo} source={images.logo} />
             </View>
-            <View style={styles.mt20}>
+            <View style={[styles.mt20]}>
               {/* {this.props.createMorning.data.response === 1 ? (
                 <View style={styles.row}>
                   <View style={styles.wdh90}>

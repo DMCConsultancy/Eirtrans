@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, Image, ScrollView} from 'react-native';
+import {View, TouchableOpacity, Image, ScrollView} from 'react-native';
 import {Container, Left, Right} from 'native-base';
 import Astro from 'react-native-vector-icons/FontAwesome5';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {colors, images} from '../../global/globalStyle';
 

@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
-  StatusBar,
   Modal,
   ScrollView,
   TextInput,
@@ -24,7 +22,10 @@ import {setJobStatusCompleted} from '../../redux/action/jobStatus';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
+
 import {
+  formatSelecttoolReqObj,
   getCurrentDate,
   PrettyPrintJSON,
   randomHash,
@@ -177,7 +178,11 @@ class Customerdetail extends Component {
       null,
     );
 
-    PrettyPrintJSON({completeJobParamsFromDescription});
+    PrettyPrintJSON({
+      formatSelecttoolReqObj: formatSelecttoolReqObj(
+        completeJobParamsFromDescription.selecttool,
+      ),
+    });
 
     // console.log({path: RNFetchBlob.wrap(result)});
 
@@ -202,7 +207,8 @@ class Customerdetail extends Component {
     apiData.append('note', notes);
     apiData.append(
       'selecttool',
-      JSON.stringify(completeJobParamsFromDescription.selecttool),
+      // JSON.stringify(completeJobParamsFromDescription.selecttool),
+      formatSelecttoolReqObj(completeJobParamsFromDescription.selecttool),
     );
     apiData.append('carkey', 0); // ask
 

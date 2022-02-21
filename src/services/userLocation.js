@@ -3,7 +3,7 @@ import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 
 import {GEOCODING_API} from '../../config.json';
-import {PrettyPrintJSON} from '../utils/helperFunctions';
+import {PrettyPrintJSON, isJSObj} from '../utils/helperFunctions';
 
 export default class UserLocation {
   constructor() {
@@ -68,36 +68,18 @@ export default class UserLocation {
       );
 
       const addressComponent = addressJson.results[0].address_components[0];
-      PrettyPrintJSON({addressComponent});
+      PrettyPrintJSON({
+        addressComponent,
+        addressJson: addressJson.results[0].formatted_address,
+      });
 
-      //   Geolocation.getCurrentPosition(
-      //     async position => {
-      //       PrettyPrintJSON({position});
-      //       const {latitude, longitude} = position.coords;
+      if (addressJson && isJSObj(addressJson)) {
+        if (Array.isArray(addressJson.results)) {
+          return addressJson.results[0]?.formatted_address;
+        }
+      }
 
-      //       const addressJson = await Geocoder.from(latitude, longitude).catch(
-      //         error => console.warn(error),
-      //       );
-
-      //       const addressComponent = addressJson.results[0].address_components[0];
-      //       PrettyPrintJSON({addressComponent});
-
-      //       //   Geocoder.from(latitude, longitude)
-      //       //     .then(json => {
-      //       //       var addressComponent = json.results[0].address_components[0];
-      //       //       PrettyPrintJSON({addressComponent});
-      //       //     })
-      //       //     .catch(error => console.warn(error));
-      //     },
-      //     error => {
-      //       // See error code charts below.
-      //       console.log(error.code, error.message);
-      //       //   reject(error.message);
-      //     },
-      //     {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-      //   );
-
-      //   console.log({coords});
+      return '';
     }
   };
 }

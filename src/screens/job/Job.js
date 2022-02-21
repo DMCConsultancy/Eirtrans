@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   FlatList,
   TouchableOpacity,
   Image,
-  StatusBar,
   Modal,
   ImageBackground,
-  ScrollView,
   ActivityIndicator,
   Platform,
   PermissionsAndroid,
@@ -27,6 +24,7 @@ import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
 import {setJobStatusFinalTruckScreenshot} from '../../redux/action/jobStatus';
@@ -212,7 +210,7 @@ class Job extends Component {
 
     console.log({collectedStatus, loadDelivered});
 
-    PrettyPrintJSON({item});
+    // PrettyPrintJSON({item});
 
     if (loadDelivered) {
       return <View />;
@@ -352,7 +350,11 @@ class Job extends Component {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
       if (responseData.response == 1) {
-        let data = responseData.data.map(loadObj => loadObj.loads[0]);
+        PrettyPrintJSON({responseData});
+        let data = responseData.data;
+
+        PrettyPrintJSON({dataaaa: data});
+
         data = data.filter(loadObj => loadObj);
         PrettyPrintJSON({jobssss: data});
 
@@ -472,7 +474,10 @@ class Job extends Component {
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           <Header>
             <Left>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>

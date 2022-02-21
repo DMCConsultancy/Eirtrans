@@ -9,6 +9,7 @@ import SelectedTruckDetailReducer from './selectedtruckdetail';
 import getMorningReducer from './setmorningdata';
 import jobStatus from './jobStatus';
 import signature from './signature';
+import notCollected from './notCollected';
 
 export default combineReducers({
   allDriver: allDriverReducer,
@@ -21,4 +22,5 @@ export default combineReducers({
   getMorning: getMorningReducer,
   jobStatus,
   signature,
+  notCollected,
 });

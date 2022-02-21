@@ -75,3 +75,57 @@ export const getCurrentLoadsJobsStatus = (data, jobStatus, loadID) => {
 
   return currentLoadsJobs;
 };
+
+export const getCurrentLoadsNotCollectedJobs = (data, notCollected, loadID) => {
+  let currentLoadsNotCollectedJobs = [];
+
+  // console.log({getCurrentLoadsJobsStatus: data});
+
+  data.map(arr => {
+    const rowData = arr[0];
+
+    const job = notCollected.find(job => {
+      // console.log({
+      //   job_id: jobs.job_id,
+      //   rowID: rowData.id,
+      //   jobLoad_id: jobs.load_id,
+      //   loadItem_id: loadItem.id,
+      // });
+
+      if (job.job_id === rowData.id && job.load_id === loadID) {
+        return true;
+      }
+      return false;
+    });
+
+    if (job) {
+      currentLoadsNotCollectedJobs.push(job);
+    }
+  });
+
+  return currentLoadsNotCollectedJobs;
+};
+
+export const formatSelecttoolReqObj = obj => {
+  let newArr = [];
+
+  if (!obj) {
+    return JSON.stringify(newArr);
+  }
+
+  obj.map(entry => {
+    if (!entry || !Array.isArray(entry) || !entry.length) {
+      return '';
+    }
+
+    newArr.push(entry[0]);
+    newArr.push(entry[1]);
+    newArr.push('');
+  });
+
+  return JSON.stringify(newArr);
+};
+
+export const isJSObj = obj => {
+  return typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
+};

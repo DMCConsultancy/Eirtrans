@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   Image,
   TextInput,
@@ -27,6 +26,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {getDeviceId} from 'react-native-device-info';
 import {getLogin, setLogin, loginError} from '../../redux/action/login';
 import CustomStatusBar from '../../components/StatusBar';
+import Text from '../../components/Text';
 
 import {PrettyPrintJSON, randomHash} from '../../utils/helperFunctions';
 
@@ -257,7 +257,10 @@ class Login extends Component {
       <Container style={styles.container}>
         <CustomStatusBar />
 
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           {this.props.allDriver.loading == false ? (
             <View style={styles.content}>
               <View style={styles.center}>
@@ -269,6 +272,9 @@ class Login extends Component {
                   placeholder={{
                     label: 'Select Driver',
                     value: null,
+                  }}
+                  textInputProps={{
+                    allowFontScaling: false
                   }}
                   items={this.props.allDriver.data}
                   onValueChange={value => {

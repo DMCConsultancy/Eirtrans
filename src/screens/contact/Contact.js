@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Container, Left, Right, Textarea} from 'native-base';
 import {
-  Text,
   TouchableOpacity,
   View,
   Image,
@@ -11,6 +10,7 @@ import {
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {colors, images} from '../../global/globalStyle';
 

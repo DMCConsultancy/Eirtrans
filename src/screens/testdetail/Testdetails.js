@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   Image,
@@ -14,27 +13,20 @@ import {images, colors} from '../../global/globalStyle';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
 import Icon from 'react-native-vector-icons/Feather';
 
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Cell,
-  Col,
-  Rows,
-} from 'react-native-table-component';
+import {Table, TableWrapper, Row, Cell} from 'react-native-table-component';
 import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 import {
   getCurrentDate,
   getCurrentLoadsJobsStatus,
-  getShippingAddressHeading,
+  getCurrentLoadsNotCollectedJobs,
   PrettyPrintJSON,
 } from '../../utils/helperFunctions';
 import {ActionButton} from '../../components/button/ActionButton';
 import {connect} from 'react-redux';
-import {style} from 'styled-system';
 import {withNavigationFocus} from 'react-navigation';
 import {
   setJobFoundShipping,
@@ -376,7 +368,7 @@ class Loads extends Component {
 
   showLoadCollected = () => {
     const {tableData, data} = this.state;
-    const {jobStatus} = this.props;
+    const {jobStatus, notCollected} = this.props;
 
     if (!data) {
       return false;
@@ -392,7 +384,13 @@ class Loads extends Component {
       loadItem.id,
     );
 
-    PrettyPrintJSON({currentLoadsJobs});
+    let currentLoadsNotCollectedJobs = getCurrentLoadsNotCollectedJobs(
+      data?.car_collection_data,
+      notCollected,
+      loadItem.id,
+    );
+
+    PrettyPrintJSON({currentLoadsJobs, currentLoadsNotCollectedJobs});
 
     if (currentLoadsJobs.length) {
       loadCollected = currentLoadsJobs.every(job => {
@@ -406,10 +404,19 @@ class Loads extends Component {
       condition: tableData.length === currentLoadsJobs.length && !loadCollected,
       condition1: tableData.length === currentLoadsJobs.length,
       condition2: loadCollected,
+      totalCurrentJobsLengthMatches:
+        currentLoadsJobs.length + currentLoadsNotCollectedJobs.length ===
+        tableData.length,
+        combined: currentLoadsJobs.length + currentLoadsNotCollectedJobs.length,
       table: tableData.length,
     });
 
-    return currentLoadsJobs.length === tableData.length && !loadCollected;
+    return (
+      (currentLoadsJobs.length === tableData.length ||
+        currentLoadsJobs.length + currentLoadsNotCollectedJobs.length ===
+          tableData.length) &&
+      !loadCollected
+    );
   };
 
   checkIfShippingCodeAlreadySet = () => {
@@ -454,7 +461,7 @@ class Loads extends Component {
 
     PrettyPrintJSON({currentLoadsJobs, found});
 
-    return found ? found.status : 0;
+    return found ? found.status : null;
   };
 
   renderShippingAddress = () => {
@@ -532,14 +539,21 @@ class Loads extends Component {
 
   renderLoadActionbuttons = () => {
     const {shippingAddress} = this.state;
+    const {navigation} = this.props;
 
-    if (!shippingAddress) {
+    const loadItem = navigation.getParam('loadItem', null);
+
+    if (!shippingAddress && loadItem.shipping_type === '1') {
       return <View />;
     }
 
     const loadStatus = this.getLoadStatus();
 
     console.log({loadStatus});
+
+    if (!loadStatus) {
+      return <View />;
+    }
 
     const onPress =
       loadStatus < 4
@@ -601,7 +615,10 @@ class Loads extends Component {
     return (
       <Container style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          blurRadius={1}
+          source={images.bg}
+          style={styles.container}>
           <Header>
             <Left>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
@@ -633,7 +650,8 @@ class Loads extends Component {
               />
               {state.tableData.map((rowData, index) => {
                 const bookingDelivered =
-                  rowData[rowData.length - 1].bookingStatus === '4';
+                  rowData[rowData.length - 1].bookingStatus === '4' ||
+                  rowData[rowData.length - 1].bookingStatus === '3';
 
                 // console.log({bookingDelivered});
 
@@ -644,7 +662,8 @@ class Loads extends Component {
                         console.log({cellData});
                         if (
                           cellData.bookingStatus === '7' ||
-                          cellData.bookingStatus === '4'
+                          cellData.bookingStatus === '4' ||
+                          cellData.bookingStatus === '3'
                         ) {
                           return (
                             <Icon
@@ -749,6 +768,7 @@ class Loads extends Component {
 const mapStateToProps = state => ({
   driverDetails: state.login.data,
   jobStatus: state.jobStatus,
+  notCollected: state.notCollected,
   signature: state.signature,
 });
 

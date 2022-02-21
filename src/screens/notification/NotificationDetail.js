@@ -1,18 +1,17 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
-  Button,
   TouchableOpacity,
   Image,
   ActivityIndicator,
 } from 'react-native';
 import {Container, Header, Left, Right, Card, CardItem} from 'native-base';
-import Icon from 'react-native-vector-icons/Feather';
 import styles from './Styles';
 import {colors, images} from '../../global/globalStyle';
 import {URL} from '../../../config.json';
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
+
+import Text from '../../components/Text';
 
 export default class Notification extends Component {
   constructor(props) {

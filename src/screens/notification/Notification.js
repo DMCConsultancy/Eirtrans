@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   FlatList,
@@ -11,14 +10,15 @@ import {Container, Left, Right, Card, CardItem} from 'native-base';
 
 import CustomStatusBar from '../../components/StatusBar';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
-import {URL} from '../../../config.json'
+import {URL} from '../../../config.json';
 
 import {colors, images} from '../../global/globalStyle';
 
 import styles from './Styles';
 import {connect} from 'react-redux';
-import { PrettyPrintJSON } from '../../utils/helperFunctions';
+import {PrettyPrintJSON} from '../../utils/helperFunctions';
 
 class Notification extends Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class Notification extends Component {
 
     apiData.append('driver_id', this.props.driverDetails.id);
 
-    PrettyPrintJSON(apiData)
+    PrettyPrintJSON(apiData);
 
     const requestOptions = {
       method: 'POST',

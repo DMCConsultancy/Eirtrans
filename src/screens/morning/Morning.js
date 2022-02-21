@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   TouchableOpacity,
   Image,
@@ -9,25 +8,18 @@ import {
   ImageBackground,
   ScrollView,
 } from 'react-native';
-import {Container, Left, Right} from 'native-base';
+import {Left, Right} from 'native-base';
 import styles from './Styles';
 import Toast from 'react-native-simple-toast';
-import {images, size, fontfamily, colors} from '../../global/globalStyle';
-import Icon from 'react-native-vector-icons/Feather';
+import {images, colors} from '../../global/globalStyle';
 import Check from 'react-native-vector-icons/Fontisto';
 import Error from 'react-native-vector-icons/MaterialIcons';
 import Success from 'react-native-vector-icons/SimpleLineIcons';
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Cell,
-  Col,
-  Rows,
-} from 'react-native-table-component';
+import {Table, TableWrapper, Row, Cell} from 'react-native-table-component';
 import {URL} from '../../../config.json';
 import Loader from '../../components/button/Loader';
 import Header from '../../components/Header';
+import Text from '../../components/Text';
 
 import {connect} from 'react-redux';
 import {
@@ -49,6 +41,7 @@ import {
 } from '../../redux/action/setmorningdata';
 import CustomStatusBar from '../../components/StatusBar';
 import {getCurrentDate, PrettyPrintJSON} from '../../utils/helperFunctions';
+import {ActionButton} from '../../components/button/ActionButton';
 
 class Morning extends Component {
   constructor(props) {
@@ -362,7 +355,6 @@ class Morning extends Component {
     this.setState({setYestable: []});
     this.setState({tableData: []});
 
-
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -499,7 +491,10 @@ class Morning extends Component {
     return (
       <View style={styles.container}>
         <CustomStatusBar />
-        <ImageBackground source={images.bg} style={styles.container}>
+        <ImageBackground
+          source={images.bg}
+          blurRadius={1}
+          style={styles.container}>
           <Header>
             <Left>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
@@ -555,7 +550,9 @@ class Morning extends Component {
               <View style={styles.mt20}>
                 <View style={{flexDirection: 'row'}}>
                   <View style={{width: '25%'}}>
-                    <Text style={styles.formLabal}>General Remarks</Text>
+                    <Text style={[styles.formLabal, {color: '#fff'}]}>
+                      General Remarks
+                    </Text>
                   </View>
 
                   <View style={{width: '75%'}}>
@@ -563,6 +560,7 @@ class Morning extends Component {
                       placeholder="Enter General Remark"
                       style={styles.textinput}
                       value={this.state.generalRemark}
+                      allowFontScaling={false}
                       onChangeText={value =>
                         this.setState({generalRemark: value})
                       }
@@ -574,7 +572,9 @@ class Morning extends Component {
               <View style={styles.mt20}>
                 <View style={{flexDirection: 'row'}}>
                   <View style={{width: '25%'}}>
-                    <Text style={styles.formLabal}>Trailar Id</Text>
+                    <Text style={[styles.formLabal, {color: '#fff'}]}>
+                      Trailar Id
+                    </Text>
                   </View>
 
                   <View style={{width: '35%'}}>
@@ -582,6 +582,7 @@ class Morning extends Component {
                       placeholder="Enter Trailar Id"
                       style={styles.textinput}
                       value={this.state.Trailar}
+                      allowFontScaling={false}
                       onChangeText={value => this.setState({Trailar: value})}
                     />
                     {this.state.errorTrailar == true ? (
@@ -606,7 +607,11 @@ class Morning extends Component {
                           this.element();
                           this.NilStatus();
                         }}>
-                        <Text style={[styles.formLabal, {marginLeft: 20}]}>
+                        <Text
+                          style={[
+                            styles.formLabal,
+                            {marginLeft: 20, color: '#fff'},
+                          ]}>
                           <Check
                             name="checkbox-passive"
                             color={colors.danger}
@@ -621,7 +626,11 @@ class Morning extends Component {
                           this.element();
                           this.NilStatus();
                         }}>
-                        <Text style={[styles.formLabal, {marginLeft: 20}]}>
+                        <Text
+                          style={[
+                            styles.formLabal,
+                            {marginLeft: 20, color: '#fff'},
+                          ]}>
                           <Check
                             name="checkbox-active"
                             color={colors.danger}
@@ -638,7 +647,9 @@ class Morning extends Component {
               <View style={styles.mt20}>
                 <View style={{flexDirection: 'row'}}>
                   <View style={{width: '25%'}}>
-                    <Text style={styles.formLabal}>Mileage</Text>
+                    <Text style={[styles.formLabal, {color: '#fff'}]}>
+                      Mileage
+                    </Text>
                   </View>
 
                   <View style={{width: '35%'}}>
@@ -647,6 +658,7 @@ class Morning extends Component {
                       keyboardType="numeric"
                       style={styles.textinput}
                       value={this.state.Mileage}
+                      allowFontScaling={false}
                       onChangeText={value => this.setState({Mileage: value})}
                     />
                     {this.state.errorMileage == true ? (
@@ -659,13 +671,21 @@ class Morning extends Component {
                     ) : null}
                   </View>
 
-                  <View style={{width: '40%'}}>
+                  {/* <View style={{width: '40%'}}>
                     <TouchableOpacity
                       style={styles.accptbtn}
                       onPress={() => this.onPress()}>
                       <Text style={styles.accptbtntxt}>Accept & Finalise</Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
+                  <ActionButton
+                    containerStyle={{alignSelf: 'flex-start', width: '50%'}}
+                    btnStyle={{width: '50%'}}
+                    onPress={() => {
+                      this.onPress();
+                    }}
+                    title={'Accept & Finalise'}
+                  />
                 </View>
               </View>
             </View>
