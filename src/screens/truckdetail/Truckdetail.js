@@ -315,6 +315,13 @@ class Truckdetail extends Component {
     const jobDelivered = this.getIfCurrentJobIsDelivered();
     const jobNotCollected = state.notCollectedObj;
 
+    PrettyPrintJSON({
+      address:
+        loadItem.shipping_type === '0' || jobCollected
+          ? "delivery_address"
+          : "collection_address",
+    });
+
     console.log({
       jobLoadCollected,
       jobDelivered,
@@ -379,7 +386,12 @@ class Truckdetail extends Component {
                       editable={false}
                       selectTextOnFocus={false}
                       // onChangeText={(form)=>this.setState({form})}
-                      value={this.state.info?.delivery_address}
+                      // value={this.state.info?.delivery_address}
+                      value={
+                        loadItem.shipping_type === '0' || jobCollected
+                          ? state.info?.delivery_address
+                          : state.info?.collection_address
+                      }
                     />
                   </View>
                 </View>
@@ -391,8 +403,12 @@ class Truckdetail extends Component {
                     ios: 'maps:0,0?q=',
                     android: 'geo:0,0?q=',
                   });
+
                   // const latLng = `${26.85535016139612},${80.94663768345126}`;
-                  const label = state.info?.delivery_address;
+                  const label =
+                    loadItem.shipping_type === '0' || jobCollected
+                      ? state.info?.delivery_address
+                      : state.info?.collection_address;
 
                   const url = Platform.select({
                     ios: `${scheme}${label}`,

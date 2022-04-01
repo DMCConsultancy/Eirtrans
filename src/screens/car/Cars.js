@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import {Container, Left, Right} from 'native-base';
 import {captureScreen} from 'react-native-view-shot';
@@ -29,6 +30,8 @@ import styles from './Styles';
 import {PrettyPrintJSON} from '../../utils/helperFunctions';
 import Loader from '../../components/button/Loader';
 import Text from '../../components/Text';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import CarDamageMarking from '../../components/CarDamageMarking';
 
 const numColumns = 3;
 
@@ -49,6 +52,9 @@ class Truckdetail extends Component {
       photos: [],
       loading: false,
       screenshotLoading: false,
+
+      markingText: null,
+      markingDamageIndex: -1,
     };
   }
 
@@ -82,7 +88,7 @@ class Truckdetail extends Component {
   onPress(index) {
     const {photos} = this.state;
 
-    this.setState({selectedItem: index});
+    this.setState({selectedItem: index, markText: null});
 
     console.log({index});
 
@@ -100,6 +106,19 @@ class Truckdetail extends Component {
       this.photoModal(!this.state.photomodal_alert);
     }
   }
+
+  handleMarking = damageID => {
+    const damage = data.find(damageObj => damageObj.id === damageID);
+
+    console.log({damage});
+
+    if (damage) {
+      this.setState({
+        markingText: damage.init,
+        markingDamageIndex: damageID,
+      });
+    }
+  };
 
   requestCameraPermission = async () => {
     if (Platform.OS === 'android') {
@@ -248,8 +267,10 @@ class Truckdetail extends Component {
 
     const photosFound = photos.find(ele => ele.id === item.id);
 
+    const actionButton = ['10', '11', '12'].includes(item.id);
+
     // do not include buttons from button as selected item
-    const condition = photosFound && !['10', '11', '12'].includes(item.id);
+    const condition = photosFound && !actionButton;
 
     // console.log({condition, photosFound});
 
@@ -260,7 +281,13 @@ class Truckdetail extends Component {
             styles.btnsty,
             condition ? {backgroundColor: colors.danger} : {},
           ]}
-          onPress={() => this.onPress(item.id)}>
+          onPress={() => {
+            if (actionButton) {
+              this.onPress(item.id);
+            } else {
+              this.handleMarking(item.id);
+            }
+          }}>
           <Text
             style={condition ? [styles.text, {color: '#fff'}] : styles.text}>
             {item.label}
@@ -498,7 +525,9 @@ class Truckdetail extends Component {
   };
 
   render() {
-    const {screenshotLoading} = this.state;
+    const {screenshotLoading, markingText, markingDamageIndex} = this.state;
+
+    console.log({markingText, markingDamageIndex});
 
     return (
       <Container style={styles.container}>
@@ -525,9 +554,11 @@ class Truckdetail extends Component {
           </Header>
 
           <ScrollView style={styles.scrollView}>
-            {/* <View style={styles.content}>
+            <CarDamageMarking
+              markText={markingText}
+              afterMarkExec={() => this.onPress(markingDamageIndex)}>
               <Image source={images.car} style={styles.imgsty} />
-            </View> */}
+            </CarDamageMarking>
             <FlatList
               columnWrapperStyle={styles.row}
               style={{paddingHorizontal: 15}}
@@ -713,15 +744,15 @@ const mapDispatchToProps = dispatch => ({});
 export default connect(mapStateToProps, mapDispatchToProps)(Truckdetail);
 
 const data = [
-  {label: 'Dent', id: '1'},
-  {label: 'Broken', id: '2'},
-  {label: 'Cracked', id: '3'},
-  {label: 'Chipped', id: '4'},
-  {label: 'Scratched', id: '5'},
-  {label: 'Holed', id: '6'},
-  {label: 'Missing', id: '7'},
-  {label: 'Other', id: '8'},
-  {label: 'Torn', id: '9'},
+  {init: 'D', label: 'Dent', id: '1'},
+  {init: 'B', label: 'Broken', id: '2'},
+  {init: 'Cr', label: 'Cracked', id: '3'},
+  {init: 'Ch', label: 'Chipped', id: '4'},
+  {init: 'S', label: 'Scratched', id: '5'},
+  {init: 'H', label: 'Holed', id: '6'},
+  {init: 'M', label: 'Missing', id: '7'},
+  {init: 'O', label: 'Other', id: '8'},
+  {init: 'T', label: 'Torn', id: '9'},
 ];
 
 const data1 = [

@@ -46,11 +46,10 @@ const styles = StyleSheet.create({
         elevation: 10,
         borderWidth:2,
         padding:10,
-        paddingVertical: 20,
         justifyContent:"center",
         alignItems:"center",
         marginHorizontal:5,
-        height: 100
+        height: 70
     },
     row:{
         flex: 1,

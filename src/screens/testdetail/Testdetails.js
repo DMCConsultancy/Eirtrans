@@ -43,6 +43,7 @@ class Loads extends Component {
       data: null,
       tableHead: [
         'customar name',
+        'make',
         'model',
         'reg',
         'collection address',
@@ -105,6 +106,7 @@ class Loads extends Component {
             [
               ele.name,
               ele.make_model,
+              ele.model,
               ele.reg,
               ele.collection_address,
               ele.lane_number,
@@ -246,6 +248,7 @@ class Loads extends Component {
       body: apiData,
     };
 
+    // PrettyPrintJSON({apiData});
     try {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
@@ -407,7 +410,7 @@ class Loads extends Component {
       totalCurrentJobsLengthMatches:
         currentLoadsJobs.length + currentLoadsNotCollectedJobs.length ===
         tableData.length,
-        combined: currentLoadsJobs.length + currentLoadsNotCollectedJobs.length,
+      combined: currentLoadsJobs.length + currentLoadsNotCollectedJobs.length,
       table: tableData.length,
     });
 
