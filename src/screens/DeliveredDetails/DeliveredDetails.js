@@ -139,7 +139,7 @@ class DeliveredDetails extends Component {
       user_id: crashDeliveredDetailsParamsFromTruckDetails.user_id,
       jobstatus: '1',
       loadcontener_id: crashDeliveredDetailsParamsFromTruckDetails.load_id,
-      lan_status: '1',
+      lan_status: '',
       signature: result,
     };
 

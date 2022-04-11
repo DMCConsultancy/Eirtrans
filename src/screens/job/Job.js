@@ -208,9 +208,10 @@ class Job extends Component {
     const collectedStatus = this.checkIfLoadIsCollected(item);
     const loadDelivered = this.checkIfLoadIsDelivered(item);
 
-    console.log({collectedStatus, loadDelivered});
-
-    // PrettyPrintJSON({item});
+    if (item.loadnumber === '2204894672') {
+      console.log({collectedStatus, loadDelivered});
+      PrettyPrintJSON({item});
+    }
 
     if (loadDelivered) {
       return <View />;
@@ -260,7 +261,7 @@ class Job extends Component {
     const {jobStatus} = this.props;
     const {showScreenshotLinks} = this.state;
 
-    console.log('checking If Load Is Collected...');
+    // console.log('checking If Load Is Collected...');
 
     let found = false;
     let truckPicUpdated = false;
@@ -295,7 +296,7 @@ class Job extends Component {
   checkIfLoadIsDelivered = item => {
     const {jobStatus} = this.props;
 
-    console.log('checking If Load Is delivered...');
+    // console.log('checking If Load Is delivered...');
 
     let found = false;
 
@@ -507,6 +508,7 @@ class Job extends Component {
                 extraData={refresh}
                 data={this.state.data}
                 renderItem={this.renderItem}
+                style={{marginBottom: 110}}
                 keyExtractor={item => item.id.toString()}
               />
             </View>
