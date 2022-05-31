@@ -690,14 +690,14 @@ class Loads extends Component {
                         }
                       }
 
-                      console.log(
-                        `returning cell on index = ${cellIndex}, ${
-                          cellData.bookingStatus === '4'
-                        }, ${cellData.bookingStatus}`,
-                      );
+                      // console.log(
+                      //   `returning cell on index = ${cellIndex}, ${
+                      //     cellData.bookingStatus === '4'
+                      //   }, ${cellData.bookingStatus}`,
+                      // );
 
                       return (
-                        <Cell
+                        <Cell   
                           key={cellIndex}
                           onPress={() => this.getCustomerID(index)}
                           data={cellData}
@@ -705,7 +705,7 @@ class Loads extends Component {
                             styles.textCell,
                             {
                               color: bookingDelivered
-                                ? colors.success
+                                ? colors.success  
                                 : colors.textDark,
                             },
                           ]}

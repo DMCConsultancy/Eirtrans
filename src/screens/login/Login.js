@@ -55,9 +55,15 @@ class Login extends Component {
       },
     };
     this.props.getDriver();
+
+    console.log({url});
+    
     try {
       let apiCall = await fetch(url, requestOptions);
       let responseData = await apiCall.json();
+
+      // PrettyPrintJSON({getAllDrivers: responseData})
+
       if (responseData.response == 1) {
         const data = responseData.data;
 
@@ -113,22 +119,22 @@ class Login extends Component {
         mobile: data[0]?.mobile,
       };
 
-      PrettyPrintJSON({params});
-
       const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
       };
+      PrettyPrintJSON({params, requestOptions});
 
       this.props.getLogin();
 
       if (this.props.netConnection.data == true) {
         try {
           let apiCall = await fetch(url, requestOptions);
+        
           let responseData = await apiCall.json();
 
           console.log(JSON.stringify({responseData}, null, 4));
