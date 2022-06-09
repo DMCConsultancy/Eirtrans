@@ -654,7 +654,9 @@ class Loads extends Component {
               {state.tableData.map((rowData, index) => {
                 const bookingDelivered =
                   rowData[rowData.length - 1].bookingStatus === '4' ||
-                  rowData[rowData.length - 1].bookingStatus === '3';
+                  rowData[rowData.length - 1].bookingStatus === 4 ||
+                  rowData[rowData.length - 1].bookingStatus === '3' ||
+                  rowData[rowData.length - 1].bookingStatus === 3;
 
                 // console.log({bookingDelivered});
 
@@ -663,10 +665,14 @@ class Loads extends Component {
                     {rowData.map((cellData, cellIndex) => {
                       if (cellData && typeof cellData === 'object') {
                         console.log({cellData});
+                        
                         if (
                           cellData.bookingStatus === '7' ||
+                          cellData.bookingStatus === 7 ||
                           cellData.bookingStatus === '4' ||
-                          cellData.bookingStatus === '3'
+                          cellData.bookingStatus === 4 ||
+                          cellData.bookingStatus === '3' ||
+                          cellData.bookingStatus === 3
                         ) {
                           return (
                             <Icon
@@ -697,7 +703,7 @@ class Loads extends Component {
                       // );
 
                       return (
-                        <Cell   
+                        <Cell
                           key={cellIndex}
                           onPress={() => this.getCustomerID(index)}
                           data={cellData}
@@ -705,7 +711,7 @@ class Loads extends Component {
                             styles.textCell,
                             {
                               color: bookingDelivered
-                                ? colors.success  
+                                ? colors.success
                                 : colors.textDark,
                             },
                           ]}
