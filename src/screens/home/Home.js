@@ -408,6 +408,28 @@ class Home extends Component {
                   !morningAccepted ? '#ccc' : '#000'
                 }
               />
+              <MyButton
+                title="TimeSheet"
+                // disabled={
+                //   // this.props.createMorning.data.response !== 1 ? true : false
+                //   morningAccepted ? false : true
+                // }
+                onPress={() => {
+                  // if (this.props.createMorning.data.response === 1) {
+                     this.props.navigation.navigate('Week');
+                  // }
+
+                  // if (morningAccepted) {
+                  //   this.props.navigation.navigate('HomeExpenses');
+                  // }
+                }}
+                backgroundColor="#fff"
+                textTransform="capitalize"
+                color={
+                  // this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
+                  !morningAccepted ? '#ccc' : '#000'
+                }
+              />
             </View>
           </View>
         </ImageBackground>

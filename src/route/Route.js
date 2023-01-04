@@ -12,6 +12,8 @@ import Contact from '../screens/contact/Contact';
 import Morning from '../screens/morning/Morning';
 import Job from '../screens/job/Job';
 import HomeExpenses from '../screens/homeEx/HomeExpenses';
+import Week from '../screens/week/week';
+import Sheet from '../screens/sheet/Sheet';
 import CustomSidebarMenu from './CustomSidebarMenu';
 import Testdetails from '../screens/testdetail/Testdetails';
 import Truckdetail from '../screens/truckdetail/Truckdetail';
@@ -84,6 +86,7 @@ const HomeStack = createStackNavigator({
     navigationOptions: {
       headerShown: false,
     },
+    
   },
 
   Cars: {
@@ -126,6 +129,18 @@ const HomeStack = createStackNavigator({
       headerShown: false,
     },
   },
+  Week: {
+    screen: Week,
+    navigationOptions: {
+      headerShown: false,
+    }
+  },
+    Sheet: {
+    screen: Sheet,
+    navigationOptions: {
+      headerShown: false,
+    },
+  }
 });
 
 const DrawerNavigator = createDrawerNavigator(
