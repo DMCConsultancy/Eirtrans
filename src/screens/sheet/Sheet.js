@@ -9,9 +9,12 @@ import {
   Image,
   PermissionsAndroid,
   Platform,
+  TextInput,
+  Alert,
 } from 'react-native';
+import DatePicker from 'react-native-datepicker';
 import React, {useEffect, useState} from 'react';
-import Header from '../../components/Header';
+import Header from '../../components/button/MyHeader';
 import st from '../../global/styles/Styles';
 import Mycheckbox from '../../components/Mycheckbox';
 import Button from '../../components/button/Button';
@@ -20,18 +23,26 @@ import {images, colors} from '../../global/theme/Theme';
 import {getApi, uploadApi} from '../../utils/apicalls/apicalls';
 import {API} from '../../utils/endpoints/endpoints';
 import {errorRes} from '../../utils/helper/helperfunctions';
-import Loader from '../../components/Loader';
 import {getPickerImageResp} from '../../utils/helper/helperfunctions';
+import Loader from '../../components/button/Loader';
+import Arrow from 'react-native-vector-icons/Feather';
+import {useSelector} from 'react-redux';
 
 const Sheet = ({navigation}) => {
   const [data, setData] = useState([]);
   const [expenses, setExpenses] = useState('');
-  const [items, setItem] = useState(navigation.getParam("item"))//route.params.item);
+  const [items, setItem] = useState(navigation.getParam('item')); //route.params.item);
   const [expensefilePath, setExpenseFilePath] = useState(null);
   const [damagefilePath, setDamageFilePath] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('');
+  const [reg, setReg] = useState('');
+  const [date, setDate] = useState('');
+  const [total_hrs, setTotal_hrs] = useState('');
+  const [weekDay, setWeekDay] = useState(navigation.getParam('weekDay'));
+
+  const driver_data = useSelector(state => state?.login?.data);
 
   const onValueChange = (text, index) => {
     const mydata = [...data];
@@ -44,7 +55,7 @@ const Sheet = ({navigation}) => {
     for (let i = 0; i < arr.length; i++) {
       amount = amount + parseInt(arr[i].amount);
     }
-    setExpenses(amount);
+    setTotal_hrs(amount);
   };
 
   const ItemView = ({item, index}) => {
@@ -240,16 +251,19 @@ const Sheet = ({navigation}) => {
     const arr = data.filter(i => i.check === true);
     let ids = [];
     for (let i = 0; i < arr.length; i++) {
-     let myid = arr[i].id;
-      ids.push(myid)
+      let myid = arr[i].id;
+      ids.push(myid);
     }
 
     const formdata = new FormData();
-    formdata.append('driver_id', '1');
+    formdata.append('driver_id', driver_data?.id);
     formdata.append('expence', ids.toString());
     if (damagefilePath) formdata.append('damage', damagefilePath);
-    // formdata.append('total_hours', '166');
-    // formdata.append('total_wage', '13');
+    formdata.append('total_hours', total_hrs);
+    formdata.append('reg', reg);
+    formdata.append('amount', expenses);
+    formdata.append('date', date);
+    formdata.append('week', weekDay);
     formdata.append('day', items.id);
     if (expensefilePath) formdata.append('expence_image', expensefilePath);
     try {
@@ -258,7 +272,15 @@ const Sheet = ({navigation}) => {
       // console.log({result: result});
       if (result.status == 200) {
         const data = result.data;
-        alert(data.message);
+        // alert(data.message);
+        Alert.alert('Success', data.message, [
+          {
+            text: 'Okay',
+            onPress: () => {
+              navigation.navigate('Home');
+            },
+          },
+        ]);
         setLoading(false);
       }
     } catch (e) {
@@ -270,61 +292,107 @@ const Sheet = ({navigation}) => {
 
   return (
     <View style={st.flex}>
-      <Loader visible={loading} />
       <Header title={`Weekly Time Sheet ${'\n'}${'\n'} ${items.day}`} />
-
-      <ScrollView>
-        <View style={st.pd20}>
-          <View>
-            <FlatList
-              data={data}
-              renderItem={ItemView}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </View>
-
-          <View style={[st.row, st.mt_v, st.pd20]}>
-            <View style={[st.wdh50]}>
-              <View style={st.box}>
-                <Text style={st.tx20}>{'Expenses'}</Text>
-                <Text style={st.tx14}>{`Amount: ${expenses}`}</Text>
-              </View>
-              <View style={st.align_C}>
-                <Button
-                  title={'Upload'}
-                  onPress={() => {
-                    toggleModalVisibility(!isModalVisible), setMode('expeses');
-                  }}
-                />
-              </View>
+      {loading &&
+        <Loader />}
+    
+        <ScrollView>
+          <View style={st.pd20}>
+            <View>
+              <FlatList
+                data={data}
+                renderItem={ItemView}
+                keyExtractor={(item, index) => index.toString()}
+              />
             </View>
 
-            <View style={[st.wdh50]}>
-              <View style={st.box2}>
-                <View style={{marginLeft: 30}}>
-                  <Text style={st.tx20}>{'Damage'}</Text>
-                  <Text style={st.tx14}>
-                    {'Car Reg:      '}
-                    {'Date:      '}
-                  </Text>
+            <View style={[st.row, st.mt_v, st.pd20]}>
+              <View style={[st.wdh50]}>
+                <View style={st.box}>
+                  <Text style={st.tx20}>{'Expenses'}</Text>
+                  <View style={[st.row, st.justify_C, st.align_C, st.mt_v]}>
+                    <Text style={st.tx14}>{`Amount:  `}</Text>
+                    <TextInput
+                      style={st.input}
+                      placeholder="Enter Expenses"
+                      value={expenses}
+                      onChangeText={text => setExpenses(text)}
+                      keyboardType={'numeric'}
+                    />
+                  </View>
+                  <View style={{marginTop: 30}}></View>
+                </View>
+                <View style={st.align_C}>
+                  <Button
+                    title={'Upload'}
+                    disabled={'0'}
+                    uri={expensefilePath?.uri}
+                    onPress={() => {
+                      toggleModalVisibility(!isModalVisible),
+                        setMode('expeses');
+                    }}
+                  />
                 </View>
               </View>
-              <View style={st.align_C}>
-                <Button
-                  title={'Upload'}
-                  onPress={() => {
-                    toggleModalVisibility(!isModalVisible), setMode('damage');
-                  }}
-                />
+
+              <View style={[st.wdh50]}>
+                <View style={st.box2}>
+                  <View style={{marginLeft: 30}}>
+                    <Text style={st.tx20}>{'Damage'}</Text>
+
+                    <View style={[st.row, st.justify_C, st.align_C, st.mt_v]}>
+                      <Text style={st.tx14}>{`Car Reg: `}</Text>
+                      <TextInput
+                        style={st.input}
+                        placeholder="Enter car reg"
+                        value={reg}
+                        onChangeText={text => setReg(text)}
+                        keyboardType={'numeric'}
+                      />
+                    </View>
+
+                    <View style={[st.row, st.justify_C, st.align_C]}>
+                      <Text style={st.tx14}>{`Date: `}</Text>
+                      <View>
+                        <DatePicker
+                          style={styles.datePicker}
+                          date={date}
+                          mode="date"
+                          placeholder={''}
+                          format="DD/MM/YYYY"
+                          confirmBtnText="Confirm"
+                          cancelBtnText="Cancel"
+                          iconComponent={
+                            <Arrow name="calendar" size={15} color="#777" />
+                          }
+                          customStyles={datePickerStyle}
+                          onDateChange={dt => {
+                            setDate(dt);
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <View style={st.align_C}>
+                  <Button
+                    title={'Upload'}
+                    uri={damagefilePath?.uri}
+                    disabled={'0'}
+                    onPress={() => {
+                      toggleModalVisibility(!isModalVisible), setMode('damage');
+                    }}
+                  />
+                </View>
               </View>
             </View>
-          </View>
 
-          <View style={[st.align_C]}>
-            <Button title={'Save'} onPress={() => saveTimeSheet_Handle()} />
+            <View style={[st.align_C]}>
+              <Button title={'Save'} onPress={() => saveTimeSheet_Handle()} disabled={'0'} />
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      
 
       <Modal
         animationType="slide"
@@ -410,4 +478,30 @@ const styles = StyleSheet.create({
     right: 20,
     top: 20,
   },
+  datePicker: {
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    height: 30,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
+const datePickerStyle = {
+  placeholderText: {
+    color: '#ccc',
+    // fontFamily: fontfamily.regular,
+    // fontSize: size.subtitle,
+  },
+  dateInput: {
+    borderWidth: 0,
+    alignItems: 'flex-start',
+  },
+  dateText: {
+    // fontFamily: fontfamily.regular,
+    // fontSize: size.subtitle,
+    color: '#000',
+  },
+};

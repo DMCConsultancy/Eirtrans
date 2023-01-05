@@ -2,7 +2,8 @@ const colors = {
   red: 'red',
   black: '#000',
   white: '#fff',
-  orange:'#eb5c14'
+  orange:'#eb5c14',
+  grey: '#cccccc'
 };
 
 const images = {

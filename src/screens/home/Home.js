@@ -51,6 +51,7 @@ class Home extends Component {
       value2: '',
       morningCheckLoader: [],
       morningAccepted: null,
+      weekday : ''
     };
   }
 
@@ -242,7 +243,18 @@ class Home extends Component {
   componentDidMount() {
     this.truckdetails();
     this.checkMorningAccepted();
+    this.getWeek_handle()
     // this.subscribeToFocusEvent();
+  }
+
+  getWeek_handle(){
+    let currentDate = new Date();
+    let startDate = new Date(currentDate.getFullYear(), 0, 1);
+    var days = Math.floor((currentDate - startDate) / (24 * 60 * 60 * 1000));
+    var weekNumber = Math.ceil(days / 7);
+    // Display the calculated result
+    console.log('Week number of ' + currentDate + ' is :   ' + weekNumber);
+    this.setState({weekday:weekNumber})
   }
 
   componentDidUpdate(prevProps) {
@@ -294,32 +306,7 @@ class Home extends Component {
               <Image style={styles.logo} source={images.logo} />
             </View>
             <View style={[styles.mt20]}>
-              {/* {this.props.createMorning.data.response === 1 ? (
-                <View style={styles.row}>
-                  <View style={styles.wdh90}>
-                    <MyButton
-                      title="Morning Checks"
-                      onPress={() => this.morningCheck()}
-                      backgroundColor="#fff"
-                      color="#000"
-                      textTransform="capitalize"
-                    />
-                  </View>
-                  <View style={styles.wdh10}>
-                    <View style={styles.iconContainer}>
-                      <Icon name="check" size={20} color={colors.success} />
-                    </View>
-                  </View>
-                </View>
-              ) : (
-                <MyButton
-                  title="Morning Checks"
-                  onPress={() => this.morningCheck()}
-                  backgroundColor="#fff"
-                  color="#000"
-                  textTransform="capitalize"
-                />
-              )} */}
+             
               {morningAccepted === false ? (
                 <MyButton
                   title="Morning Checks"
@@ -410,24 +397,13 @@ class Home extends Component {
               />
               <MyButton
                 title="TimeSheet"
-                // disabled={
-                //   // this.props.createMorning.data.response !== 1 ? true : false
-                //   morningAccepted ? false : true
-                // }
                 onPress={() => {
-                  // if (this.props.createMorning.data.response === 1) {
-                     this.props.navigation.navigate('Week');
-                  // }
-
-                  // if (morningAccepted) {
-                  //   this.props.navigation.navigate('HomeExpenses');
-                  // }
+                  this.props.navigation.navigate('Week',{weekday:this.state.weekday});
                 }}
                 backgroundColor="#fff"
                 textTransform="capitalize"
                 color={
-                  // this.props.createMorning.data.response !== 1 ? '#ccc' : '#000'
-                  !morningAccepted ? '#ccc' : '#000'
+                  !morningAccepted ? '#000' : '#000'
                 }
               />
             </View>

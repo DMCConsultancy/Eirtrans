@@ -65,13 +65,24 @@ export default StyleSheet.create({
     fontFamily: family.bold,
   },
   box: {
-    borderRightWidth: 1, 
+    borderRightWidth: 1,
     borderColor: '#000',
     // alignItems:'center'
   },
   box2: {
-    borderLeftWidth: 1, 
+    borderLeftWidth: 1,
     borderColor: '#000',
     // alignItems:'center'
+  },
+  input: {
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: colors.grey,
+    height: 35,
+    fontSize: size.label,
+    color: colors.warning,
+    fontFamily: family.light,
+    width:"60%"
+    // paddingHorizontal: 10,
   },
 });
